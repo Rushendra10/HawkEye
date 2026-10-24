@@ -38,6 +38,8 @@ PARAMS: Dict[str, float] = {
     "ransac_k": 3.0,             # drop residuals > k * median, refit once           (MATH 7)
     "drop_max_hspeed": 0.5,      # drop classification
     "drop_min_vup": -3.0,            # the track may start a few frames after release
+    "max_bounce_gap_m": 0.15,    # legs whose fits do not meet are separate throws, not a bounce
+    "short_leg_sigma": 0.5,      # for bounce speeds, legs with g_sigma above this use a g-fixed fit            # the track may start a few frames after release
 }
 
 
@@ -186,6 +188,21 @@ def triangulate(C1: np.ndarray, D1: np.ndarray, C2: np.ndarray, D2: np.ndarray, 
 
 
 # ---------------------------------------------------------------- segmentation (MATH 6)
+
+def fit_fixed_g(T: np.ndarray, X: np.ndarray, up: np.ndarray, g: float = 9.81) -> Optional[Fit]:
+    """Velocity-only fit with the acceleration fixed to g downward; used for bounce speeds on legs
+    too short to determine their own acceleration (never for the reported g)."""
+    if len(T) < 3:
+        return None
+    t0 = float(T[0])
+    tau = T - t0
+    a = -g * up
+    Y = X - 0.5 * np.outer(tau ** 2, a)
+    A = np.stack([np.ones_like(tau), tau], axis=1)
+    coef, *_ = np.linalg.lstsq(A, Y, rcond=None)
+    r = np.linalg.norm(Y - A @ coef, axis=1)
+    return Fit(t0, coef[0], coef[1], a, float(T[-1]), float(np.sqrt(np.mean(r ** 2))), len(T), len(T), 0.0)
+
 
 def angle_deg(a: np.ndarray, b: np.ndarray) -> float:
     c = float(np.dot(a, b) / max(np.linalg.norm(a) * np.linalg.norm(b), 1e-12))
@@ -347,7 +364,8 @@ def bounce_metrics(f1: Fit, f2: Fit, t_lo: float, t_hi: float) -> Dict[str, Any]
 # ---------------------------------------------------------------- one throw end to end
 
 def solve_event(tA: np.ndarray, uvA: np.ndarray, camA: Camera, tB: np.ndarray, uvB: np.ndarray, camB: Camera,
-                up: np.ndarray, p: Dict[str, float]) -> Optional[Dict[str, Any]]:
+                up: np.ndarray, p: Dict[str, float]) -> List[Dict[str, Any]]:
+    """One paired event -> a list of throws (usually one; two if the legs do not meet at a bounce)."""
     # the device with more samples defines the sample times; dt is always reported as the clock of
     # the alphabetically second device minus the first, whichever is the reference
     sign = 1.0 if camA.device_id < camB.device_id else -1.0
@@ -367,14 +385,14 @@ def solve_event(tA: np.ndarray, uvA: np.ndarray, camA: Camera, tB: np.ndarray, u
         X, resid, good = triangulate(c1.C[None, :], D1, c2.C[None, :], D2, p)
         Ts.append(t1[ok][good]); Xs.append(X[good]); Rs.append(resid[good])
     if not Ts:
-        return None
+        return []
     T = np.concatenate(Ts); X = np.concatenate(Xs); resid = np.concatenate(Rs)
     order = np.argsort(T, kind="stable")
     T, X, resid = T[order], X[order], resid[order]
     keep = np.concatenate([[True], np.diff(T) > 1e-4])     # coincident samples from both cameras
     T, X, resid = T[keep], X[keep], resid[keep]
     if len(T) < p["min_seg_points"]:
-        return None
+        return []
     # Smearing from interpolating across the impact lasts up to one frame of the slower camera.
     corner_s = 1.2 * max(float(np.median(np.diff(tA))) if len(tA) > 1 else 0.0,
                          float(np.median(np.diff(tB))) if len(tB) > 1 else 0.0)
@@ -407,17 +425,37 @@ def solve_event(tA: np.ndarray, uvA: np.ndarray, camA: Camera, tB: np.ndarray, u
                                     for (x, y, z), t in zip(X[idx], T[idx])],
                          "fit": segment_metrics(fit, up, p)})
     if not segments:
-        return None
-    bounce = None
-    if len(fits) >= 2:
-        (f1, i1), (f2, i2) = fits[0], fits[1]
-        bounce = bounce_metrics(f1, f2, float(T[i1[-1]]), float(T[i2[0]]))
-    return {"t_start": round(float(T[0]), 4), "t_end": round(float(T[-1]), 4),
-            "dt_refined_ms": round(sign * dt * 1000, 1), "dt_cost_cm": round(cost * 100, 2),
-            "ref_device": camA.device_id, "n_points": int(len(T)),
-            "tri_resid_cm": round(float(np.median(resid)) * 100, 2),
-            "segments": segments, "bounce": bounce,
-            "calibration_suspect": bool(cost > p["max_dt_cost_m"])}
+        return []
+    common = {"dt_refined_ms": round(sign * dt * 1000, 1), "dt_cost_cm": round(cost * 100, 2),
+              "ref_device": camA.device_id, "tri_resid_cm": round(float(np.median(resid)) * 100, 2),
+              "calibration_suspect": bool(cost > p["max_dt_cost_m"])}
+    # group consecutive legs into throws: a bounce joins two legs whose fits meet at the impact
+    throws: List[Dict[str, Any]] = []
+    groups: List[List[int]] = [[0]]
+    for i in range(1, len(fits)):
+        f1, i1 = fits[i - 1]
+        f2, i2 = fits[i]
+        t_imp = closest_approach(f1, f2, float(T[i1[-1]]), float(T[i2[0]]))
+        gap = float(np.linalg.norm(f1.pos(t_imp) - f2.pos(t_imp)))
+        if gap <= p["max_bounce_gap_m"] and len(groups[-1]) == 1:
+            groups[-1].append(i)
+        else:
+            groups.append([i])
+    for grp in groups:
+        segs = [segments[i] for i in grp]
+        idx_all = np.concatenate([fits[i][1] for i in grp])
+        bounce = None
+        if len(grp) == 2:
+            (f1, i1), (f2, i2) = fits[grp[0]], fits[grp[1]]
+            # legs too short to carry their own g use a g-fixed fit for the impact velocities
+            g1 = f1 if f1.a_sigma <= p["short_leg_sigma"] else (fit_fixed_g(T[i1], X[i1], up) or f1)
+            g2 = f2 if f2.a_sigma <= p["short_leg_sigma"] else (fit_fixed_g(T[i2], X[i2], up) or f2)
+            bounce = bounce_metrics(g1, g2, float(T[i1[-1]]), float(T[i2[0]]))
+        th = dict(common)
+        th.update({"t_start": round(float(T[idx_all[0]]), 4), "t_end": round(float(T[idx_all[-1]]), 4),
+                   "n_points": int(len(idx_all)), "segments": segs, "bounce": bounce})
+        throws.append(th)
+    return throws
 
 
 def drop_stats(throws: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
@@ -445,9 +483,7 @@ def solve_latest(buffers: Dict[str, Sequence[Dict[str, Any]]], devices: Dict[str
     throws = []
     for ev in find_events(data, now, p):
         (a, ia), (b, ib) = list(ev.items())
-        res = solve_event(data[a][0][ia], data[a][1][ia], cams[a], data[b][0][ib], data[b][1][ib], cams[b], upv, p)
-        if res:
-            throws.append(res)
+        throws.extend(solve_event(data[a][0][ia], data[a][1][ia], cams[a], data[b][0][ib], data[b][1][ib], cams[b], upv, p))
     throws.sort(key=lambda t: t["t_start"])
     for i, t in enumerate(throws):
         t["id"] = i + 1

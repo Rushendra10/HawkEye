@@ -305,7 +305,8 @@ def get_latest() -> Dict[str, Any]:
                          "reproj_px": info.get("reproj_px"), "n_calib_images": info.get("n_images", 0),
                          "buffered": len(buffers.get(d, ()))})
         return {"server_time": now, "session": SESSION, "cameras": cams, "baseline_m": current_baseline(),
-                "up": UP, "throws": _throw_list(), "drops": dict(drops)}
+                "up": UP, "throws": _throw_list(), "drops": dict(drops),
+                "board": {"cols": CFG["board_cols"], "rows": CFG["board_rows"], "square_size_m": CFG["square_size_m"]}}
 
 
 class SimCameras(BaseModel):
