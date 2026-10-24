@@ -22,6 +22,10 @@ phone, roughly facing both). `cv2.solvePnP(objectPoints, corners, K, dist, flags
 → `rvec, tvec` = `T_cam_board`. Then `T_board_cam = inv(T_cam_board)`; camera center
 `C = T_board_cam[:3, 3]`, rotation `R = T_board_cam[:3, :3]` (camera → board).
 Object points: `(i·s, j·s, 0)` for column `i`, row `j`, square size `s`. `up = [0, -1, 0]`.
+Cameras come out at **negative z** (OpenCV's board z points into the screen); that is expected.
+Use `flags=cv2.CALIB_FIX_K3` in `calibrateCamera` — with 8 views k3 overfits (seen: k3 = 4.1).
+Reference numbers from Saturday (real data): intrinsics RMS 0.22–0.34 px; lock reprojection
+0.26–0.43 px with the board 250–320 px wide in a 1920-px frame.
 Reproject the corners and report the error (want < 1 px); if the baseline is off at GATE 1, this
 number and the board detection at distance are the first suspects.
 

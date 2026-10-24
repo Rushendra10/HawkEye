@@ -17,7 +17,9 @@ only during calibration, never during throws.
   with the calibrated distortion, `cv2.undistortPoints`).
 - **World frame = the board frame** from the Lock photo: origin at the board's first inner corner,
   `+x` along the board's columns (to the right on the screen), `+y` along rows (down the screen),
-  `+z` out of the screen toward the phones. With the laptop lid vertical, **up = `[0, -1, 0]`**.
+  `+z = x × y`, i.e. **into** the screen — so cameras in front of the screen have **negative z**
+  (verified on real data: both phones at z ≈ −0.6 m). With the laptop lid vertical,
+  **up = `[0, -1, 0]`**.
   `solvePnP` gives `T_cam_board` (board → camera); the server stores `T_board_cam = inv(...)`.
 - All rays, points, and fits are expressed in the board frame.
 
