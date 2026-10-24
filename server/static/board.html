@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>HawkEye board</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  canvas { display: block; }
+  #hint { position: fixed; bottom: 6px; left: 8px; font: 13px system-ui; color: #666; background: rgba(255,255,255,.85); padding: 4px 8px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hint"></div>
+<script>
+  // 10 x 7 squares = 9 x 6 inner corners (OpenCV pattern size (9, 6)).
+  const COLS = 10, ROWS = 7;
+  const c = document.getElementById('c'), ctx = c.getContext('2d');
+  function draw() {
+    const margin = 0.06;
+    const sq = Math.floor(Math.min(window.innerWidth * (1 - margin) / COLS, window.innerHeight * (1 - margin) / ROWS));
+    c.width = sq * COLS; c.height = sq * ROWS;
+    for (let r = 0; r < ROWS; r++) for (let k = 0; k < COLS; k++) {
+      ctx.fillStyle = ((r + k) % 2 === 0) ? '#000' : '#fff';
+      ctx.fillRect(k * sq, r * sq, sq, sq);
+    }
+    document.getElementById('hint').textContent =
+      `Fullscreen (⌃⌘F), brightness max, lid vertical. Board is ${COLS}×${ROWS} squares (9×6 inner corners). ` +
+      `Each square is ${sq}px — measure the full board width with a ruler and divide by ${COLS}; that is square_size_m. Press H to hide.`;
+  }
+  window.addEventListener('resize', draw); draw();
+  document.addEventListener('keydown', e => { if (e.key.toLowerCase() === 'h') document.getElementById('hint').style.display = 'none'; });
+</script>
+</body>
+</html>
