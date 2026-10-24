@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HawkEye board</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; cursor: none; }
+  canvas { display: block; }
+  #info { position: fixed; left: 8px; bottom: 6px; font: 13px -apple-system, system-ui, sans-serif;
+          color: #888; background: rgba(255,255,255,.85); padding: 2px 6px; border-radius: 4px; cursor: default; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="info"></div>
+<script>
+// Chessboard with 9x6 INNER corners = 10x7 squares (MATH.md s1). The squares are as large as fit the
+// screen and are an integer number of CSS pixels so every square is identical. Measure one square
+// with a ruler and put the value in config.json (square_size_m). Press F for fullscreen, H to hide
+// this label. Keep the laptop lid vertical and brightness at maximum while the phones look at it.
+const COLS = 10, ROWS = 7;
+const c = document.getElementById('c'), ctx = c.getContext('2d'), info = document.getElementById('info');
+function draw() {
+  const W = window.innerWidth, H = window.innerHeight, dpr = window.devicePixelRatio || 1;
+  const s = Math.floor(Math.min(W / COLS, H / ROWS));          // square size, CSS px
+  c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+  const x0 = Math.floor((W - s * COLS) / 2), y0 = Math.floor((H - s * ROWS) / 2);
+  ctx.fillStyle = '#000';
+  for (let r = 0; r < ROWS; r++) for (let q = 0; q < COLS; q++)
+    if ((r + q) % 2 === 0) ctx.fillRect(x0 + q * s, y0 + r * s, s, s);
+  info.textContent = `${COLS}x${ROWS} squares, ${COLS - 1}x${ROWS - 1} inner corners, square = ${s} css px (x${dpr}) ` +
+                     `- measure one square with a ruler -> config.json square_size_m. F fullscreen, H hide.`;
+}
+window.addEventListener('resize', draw);
+document.addEventListener('keydown', e => {
+  if (e.key === 'f' || e.key === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }
+  if (e.key === 'h' || e.key === 'H') info.style.display = info.style.display === 'none' ? '' : 'none';
+});
+draw();
+</script>
+</body>
+</html>
