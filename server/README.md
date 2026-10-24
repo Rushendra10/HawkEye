@@ -1,32 +1,54 @@
 # server — teammate's half
 
-Read, in order: `../docs/API.md` (the contract), `../docs/MATH.md` (the solver), `../PLAN.md` §3
-(what is due when). Everything you need is in those three files.
+Read, in order: `../docs/API.md` (the contract), `../docs/MATH.md` (calibration + solver),
+`../PLAN.md` §3 (what is due when). Everything you need is in those three files.
+
+## Files you own
+
+```
+app.py             FastAPI: /time /calib_image /intrinsics /lock /detections /latest /reset + static
+calibrate.py       OpenCV: intrinsics from photos, extrinsics (solvePnP) from the lock photo
+solver.py          MATH.md §2–§7; runnable offline: python solver.py data/<session>/
+simulate.py        synthetic two-camera throws conforming to the API (MATH.md §9)
+static/index.html  dashboard (MATH.md §10)
+static/board.html  chessboard page, 9×6 inner corners, as large as fits the screen
+config.json        { "square_size_m": 0.028, "board_cols": 9, "board_rows": 6 }
+```
+`static/capture.html` is Rushendra's; don't edit it, just serve it.
 
 ## Build order
 
-1. `app.py` — FastAPI with `GET /time`, `POST /calibration`, `POST /detections`, `GET /latest`,
-   `POST /reset`, static dashboard. Every POST body appended to `data/<session>/*.jsonl`
-   with `received_at`. Run with `uvicorn app:app --host 0.0.0.0 --port 8000`.
-2. `simulate.py` — synthetic two-camera throws conforming to the API (MATH.md §9). Can POST to a
-   running server or write JSONL. **This exists before any real data does.**
-3. `solver.py` — MATH.md §1–§7, runnable as `python solver.py data/<session>/` and importable by
-   `app.py`. Test against the simulator until `g` comes back within ±0.2.
-4. `static/index.html` — the dashboard (MATH.md §10). Plotly from CDN, polls `/latest`.
-5. Real data: Rushendra will commit the first real session under `data/` (small files). Run the
-   solver on it; expect to hit a sign issue once — MATH.md §8.
-6. Δt refinement, bounce segmentation, restitution, drop statistics.
-7. Slides chart: error vs number of cameras / angle, from the simulator.
+1. `app.py` with all endpoints, JSONL logging, static serving. Run on Windows with plain HTTP
+   for development (`uvicorn app:app --port 8000`); TLS is only needed on the Mac for phones.
+2. `static/board.html`.
+3. `simulate.py` → `solver.py` until `g` comes back within ±0.2 on synthetic data.
+4. `calibrate.py`: test intrinsics with 8 photos of the board taken with *your* phone's Camera
+   app (any photos work for development), then `solvePnP` on one more. Print baseline when two
+   devices are locked. Rushendra runs GATE 1 with this at 18:00.
+5. `static/index.html`.
+6. Real data arrives Saturday evening (`data/` committed). Expect one sign bug — MATH.md §8.
+7. Δt refinement, bounce split, restitution, drop stats.
+8. Slides chart: error vs number of cameras / angle (simulator sweep).
+
+## Windows setup
+
+```powershell
+cd server
+py -3 -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app:app --host 0.0.0.0 --port 8000
+```
 
 ## Constraints
 
-- Python 3.9 compatible (the Mac that runs this at demo time has 3.9): no `match`, use
-  `typing.Optional[...]`, `list[...]` is fine only with `from __future__ import annotations`.
-- Dependencies: fastapi, uvicorn, numpy, scipy. Nothing else unless it saves an hour.
+- Python 3.9 compatible (the Mac has 3.9): no `match`, use `typing.Optional`, or add
+  `from __future__ import annotations` for `list[...]`.
+- Dependencies: fastapi, uvicorn, numpy, scipy, opencv-python-headless, python-multipart.
 - No database, no auth, no websockets. In-memory state + JSONL logs.
-- Keep `solver.py` free of FastAPI imports so it runs offline.
+- `solver.py` and `calibrate.py` import no FastAPI.
 
-## Running at the demo
+## Running on the Mac at the demo
 
-On the Mac: `git pull`, `source .venv/bin/activate`, `uvicorn app:app --host 0.0.0.0 --port 8000`.
-Dashboard on the projector at `http://<mac-ip>:8000/`.
+`git pull`, `source .venv/bin/activate`, `pip install -r requirements.txt`,
+`uvicorn app:app --host 0.0.0.0 --port 8443 --ssl-certfile certs/cert.pem --ssl-keyfile certs/key.pem`.
