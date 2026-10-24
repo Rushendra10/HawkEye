@@ -11,3 +11,5 @@ ios/**/xcuserdata/
 ios/**/DerivedData/
 ios/**/*.xcuserstate
 .DS_Store
+server/data/dev/
+server/data/dev_server.log
