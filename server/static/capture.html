@@ -217,6 +217,7 @@
     } catch (e) { status('intrinsics request failed: ' + e.message, true); }
   };
   $('lock').onclick = async () => {
+    for (let s = 3; s > 0; s--) { status(`locking in ${s}… hands off the phone`); await new Promise(r => setTimeout(r, 1000)); }
     try { const j = await upload('/lock', await fullJpeg());
       if (!j.ok) return status('lock failed: ' + (j.message || 'board not found?'), true);
       const p = j.camera_position || []; status(`LOCKED at (${p.map(x => (+x).toFixed(2)).join(', ')})` + (j.baseline_m ? ` · baseline ${(+j.baseline_m).toFixed(2)} m` : '') + (j.stub ? ' (stub)' : '') + ' — DO NOT MOVE THE PHONE');
