@@ -30,6 +30,22 @@ config.json        { "square_size_m": 0.028, "board_cols": 9, "board_rows": 6 }
 7. Δt refinement, bounce split, restitution, drop stats.
 8. Slides chart: error vs number of cameras / angle (simulator sweep).
 
+## Tests (no phone needed)
+
+```powershell
+python test_calibrate.py                 # synthetic board photos -> intrinsics, lock, baseline
+python simulate.py --check 20            # 20 drops / arcs / wall throws through the solver; PASS/FAIL
+python simulate.py --out data/sim_a --mode wall --n 3 ; python solver.py data/sim_a   # offline path
+uvicorn app:app --port 8000              # then, in another shell:
+python test_api.py                       # every endpoint with two virtual phones
+python simulate.py --post http://127.0.0.1:8000 --mode drop --n 5 --realtime        # live path
+python simulate.py --sweep               # error vs camera angle / count, for the slides
+```
+
+Expect on synthetic data: `g` within ±0.2 on drops and lobs, restitution within ±0.05, and a
+reported `g_sigma` per leg. A leg shorter than ~0.3 s (the first leg of a hard wall throw) is
+noise-limited: ±0.5 is normal there, and the dashboard shows the ± so the number stays honest.
+
 ## Windows setup
 
 ```powershell

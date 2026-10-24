@@ -56,7 +56,8 @@ _lock = threading.Lock()
 devices: Dict[str, Dict[str, Any]] = {}
 # device_id -> deque of {"t": server_time, "u", "v", "n", "w", "h"} (rolling 60 s)
 buffers: Dict[str, Deque[Dict[str, Any]]] = {}
-throws: List[Dict[str, Any]] = []
+# throws keyed by their start time (rounded to 0.1 s) so re-solving a batch updates, not duplicates
+throws: Dict[float, Dict[str, Any]] = {}
 drops: Dict[str, Any] = {"count": 0, "g_mean": None, "g_std": None}
 
 
@@ -257,23 +258,38 @@ def post_detections(body: DetectionsBody) -> Dict[str, Any]:
 
 
 def _run_solver() -> None:
-    """Call solver.solve_latest if available (MATH.md sections 3-7). Never raise into the request."""
+    """Call solver.solve_latest on the rolling buffers (MATH.md sections 3-7). Never raise into the request."""
     if solver is None or not hasattr(solver, "solve_latest"):
         return
     try:
         with _lock:
             snap_buffers = {d: list(b) for d, b in buffers.items()}
             snap_cams = {d: dict(v) for d, v in devices.items() if v.get("T_board_cam")}
-        res = solver.solve_latest(snap_buffers, snap_cams, UP, CFG)  # type: ignore[attr-defined]
+        res = solver.solve_latest(snap_buffers, snap_cams, UP, CFG, now=time.time())  # type: ignore[attr-defined]
         if not res:
             return
         with _lock:
-            if "throws" in res:
-                throws[:] = res["throws"]
-            if "drops" in res:
-                drops.update(res["drops"])
+            for th in res.get("throws", []):
+                key = round(th["t_start"], 1)
+                # the same throw can shift by a sample when re-solved; merge onto a neighbour key
+                for k in list(throws):
+                    if abs(k - key) <= 0.3 and k != key:
+                        del throws[k]
+                throws[key] = th
+            _renumber()
+            drops.update(solver.drop_stats(list(throws.values())))  # type: ignore[attr-defined]
+            log_jsonl("throws", {"throws": [throws[k] for k in sorted(throws)][-3:], "drops": dict(drops)})
     except Exception as e:  # noqa: BLE001
         print("solver error:", repr(e))
+
+
+def _renumber() -> None:
+    for i, k in enumerate(sorted(throws)):
+        throws[k]["id"] = i + 1
+
+
+def _throw_list() -> List[Dict[str, Any]]:
+    return [throws[k] for k in sorted(throws)]
 
 
 @app.get("/latest")
@@ -289,7 +305,26 @@ def get_latest() -> Dict[str, Any]:
                          "reproj_px": info.get("reproj_px"), "n_calib_images": info.get("n_images", 0),
                          "buffered": len(buffers.get(d, ()))})
         return {"server_time": now, "session": SESSION, "cameras": cams, "baseline_m": current_baseline(),
-                "up": UP, "throws": list(throws), "drops": dict(drops)}
+                "up": UP, "throws": _throw_list(), "drops": dict(drops)}
+
+
+class SimCameras(BaseModel):
+    devices: Dict[str, Dict[str, Any]]
+
+
+@app.post("/sim_cameras")
+def post_sim_cameras(body: SimCameras) -> Dict[str, Any]:
+    """Development only: register virtual cameras from simulate.py --post (replaces real calibration)."""
+    with _lock:
+        devices.clear()
+        buffers.clear()
+        throws.clear()
+        for d, info in body.devices.items():
+            devices[d] = {k: v for k, v in info.items() if not k.startswith("_")}
+            devices[d]["simulated"] = True
+        save_calibration()
+    log_jsonl("requests", {"path": "/sim_cameras", "devices": sorted(body.devices)})
+    return {"ok": True, "devices": sorted(devices), "baseline_m": current_baseline()}
 
 
 @app.post("/reset")

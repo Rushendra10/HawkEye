@@ -176,6 +176,32 @@ def pixel_to_ray(u: float, v: float, K: np.ndarray, dist: np.ndarray, T_board_ca
     return T[:3, 3].copy(), d_world
 
 
+def pixels_to_rays(uv: np.ndarray, K: np.ndarray, dist: np.ndarray, T_board_cam: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Vectorized pixel_to_ray. uv (N, 2) -> (C (3,), D (N, 3) unit directions in the board frame)."""
+    K = np.asarray(K, np.float64)
+    dist = np.asarray(dist, np.float64).ravel()
+    T = np.asarray(T_board_cam, np.float64)
+    uv = np.asarray(uv, np.float64).reshape(-1, 1, 2)
+    if len(uv) == 0:
+        return T[:3, 3].copy(), np.zeros((0, 3))
+    und = cv2.undistortPoints(uv, K, dist, P=K).reshape(-1, 2)
+    d = np.stack([(und[:, 0] - K[0, 2]) / K[0, 0], (und[:, 1] - K[1, 2]) / K[1, 1], np.ones(len(und))], axis=1)
+    d /= np.linalg.norm(d, axis=1, keepdims=True)
+    return T[:3, 3].copy(), d @ T[:3, :3].T
+
+
+def project_points(P: np.ndarray, K: np.ndarray, dist: np.ndarray, T_board_cam: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Inverse of pixels_to_rays for the simulator: board-frame points (N, 3) -> (uv (N, 2), depth (N,))."""
+    T = np.asarray(T_board_cam, np.float64)
+    T_cam_board = np.linalg.inv(T)
+    R, t = T_cam_board[:3, :3], T_cam_board[:3, 3]
+    Pc = np.asarray(P, np.float64).reshape(-1, 3) @ R.T + t
+    rvec, _ = cv2.Rodrigues(R)
+    uv, _ = cv2.projectPoints(np.asarray(P, np.float64).reshape(-1, 3), rvec, t, np.asarray(K, np.float64),
+                              np.asarray(dist, np.float64).ravel())
+    return uv.reshape(-1, 2), Pc[:, 2]
+
+
 # ---------------------------------------------------------------- CLI for development
 
 def _main() -> None:
