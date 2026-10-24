@@ -1,0 +1,13 @@
+# python
+server/.venv/
+__pycache__/
+*.pyc
+
+# keep small real sessions committed on purpose; ignore big ones by hand
+server/data/*/videos/
+
+# xcode
+ios/**/xcuserdata/
+ios/**/DerivedData/
+ios/**/*.xcuserstate
+.DS_Store
