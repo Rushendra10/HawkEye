@@ -6,48 +6,52 @@
 <title>HawkEye capture</title>
 <style>
   :root { color-scheme: dark; }
-  html, body { margin: 0; height: 100%; background: #000; color: #eee; font: 14px -apple-system, system-ui, sans-serif; overflow: hidden; }
-  #stage { position: relative; width: 100vw; height: 62vh; background: #111; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; color: #eee; font: 13px -apple-system, system-ui, sans-serif; }
+  #app { display: flex; flex-direction: row; height: 100%; width: 100%;
+         padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+  #stage { position: relative; flex: 1 1 auto; min-width: 0; background: #111; }
   video, #overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
   #overlay { pointer-events: none; }
-  #bar { padding: 6px 10px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-  button { font-size: 15px; padding: 10px 14px; border-radius: 10px; border: 0; background: #2b6cff; color: #fff; }
+  #panel { flex: 0 0 290px; display: flex; flex-direction: column; gap: 6px; padding: 8px; overflow-y: auto;
+           -webkit-overflow-scrolling: touch; background: #0a0a0a; border-left: 1px solid #222; }
+  .row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .row > button { flex: 1 1 auto; }
+  button { font-size: 14px; padding: 9px 8px; border-radius: 9px; border: 0; background: #2b6cff; color: #fff; white-space: nowrap; }
   button.alt { background: #444; } button.warn { background: #c0392b; } button.ok { background: #1e9e5a; }
   button:disabled { opacity: .4; }
-  input[type=text] { font-size: 14px; padding: 6px; border-radius: 6px; border: 1px solid #555; background: #111; color: #eee; width: 120px; }
-  input[type=range] { width: 110px; }
-  #stats { font-variant-numeric: tabular-nums; color: #9fd; }
-  #status { padding: 4px 10px; color: #ffd166; min-height: 18px; }
-  #swatch { display: inline-block; width: 22px; height: 22px; border-radius: 5px; border: 1px solid #777; vertical-align: middle; }
-  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  label { color: #aaa; }
+  input[type=text] { font-size: 14px; padding: 7px; border-radius: 6px; border: 1px solid #555; background: #111; color: #eee; width: 100%; }
+  input[type=range] { flex: 1 1 auto; min-width: 0; }
+  label { color: #aaa; display: flex; align-items: center; gap: 6px; }
+  #stats { font-variant-numeric: tabular-nums; color: #9fd; line-height: 1.3; }
+  #status { color: #ffd166; line-height: 1.3; min-height: 2.6em; }
+  #swatch { display: inline-block; width: 24px; height: 24px; border-radius: 5px; border: 1px solid #777; flex: 0 0 auto; }
+  .val { color: #ccc; min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; }
+  @media (orientation: portrait) {
+    #app { flex-direction: column; }
+    #stage { flex: 0 0 45vh; }
+    #panel { flex: 1 1 auto; border-left: 0; border-top: 1px solid #222; }
+  }
 </style>
 </head>
 <body>
-<div id="stage">
-  <video id="v" playsinline muted autoplay></video>
-  <canvas id="overlay"></canvas>
-</div>
-<div id="bar">
-  <div class="row">
-    <button id="start">Start camera</button>
-    <label>device <input id="dev" type="text" placeholder="iphone16"></label>
-    <span id="stats">—</span>
+<div id="app">
+  <div id="stage">
+    <video id="v" playsinline muted autoplay></video>
+    <canvas id="overlay"></canvas>
   </div>
-  <div class="row">
-    <button id="sample" class="alt" disabled>Sample ball</button><span id="swatch"></span>
-    <label>tol <input id="tol" type="range" min="0.02" max="0.15" step="0.005"></label><span id="tolv"></span>
-    <label>minpx <input id="minpx" type="range" min="5" max="150" step="5"></label><span id="minpxv"></span>
-  </div>
-  <div class="row">
-    <button id="calib" class="alt" disabled>Calib photo (<span id="ncal">0</span>)</button>
-    <button id="intr" class="alt" disabled>Compute intrinsics</button>
-    <button id="lock" class="alt" disabled>Lock</button>
-    <button id="live" class="ok" disabled>Live: off</button>
-    <button id="sync" class="alt">Sync clock</button>
+  <div id="panel">
+    <div class="row"><button id="start">Start camera</button><button id="sync" class="alt">Sync clock</button></div>
+    <input id="dev" type="text" placeholder="device name, e.g. iphone16">
+    <div id="stats">—</div>
+    <div class="row"><button id="sample" class="alt" disabled>Sample ball</button><span id="swatch"></span></div>
+    <label>tol <input id="tol" type="range" min="0.02" max="0.15" step="0.005"><span id="tolv" class="val"></span></label>
+    <label>minpx <input id="minpx" type="range" min="5" max="150" step="5"><span id="minpxv" class="val"></span></label>
+    <div class="row"><button id="calib" class="alt" disabled>Calib photo (<span id="ncal">0</span>)</button><button id="intr" class="alt" disabled>Intrinsics</button></div>
+    <div class="row"><button id="lock" class="alt" disabled>Lock</button><button id="live" class="ok" disabled>Live: off</button></div>
+    <div id="status">Hold the phone landscape. Tap Start camera.</div>
   </div>
 </div>
-<div id="status">Open on the phone in landscape. Tap Start camera.</div>
 
 <script>
 (() => {
