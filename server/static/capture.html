@@ -49,6 +49,7 @@
     <label>minpx <input id="minpx" type="range" min="5" max="150" step="5"><span id="minpxv" class="val"></span></label>
     <div class="row"><button id="calib" class="alt" disabled>Calib photo (<span id="ncal">0</span>)</button><button id="intr" class="alt" disabled>Intrinsics</button></div>
     <div class="row"><button id="lock" class="alt" disabled>Lock</button><button id="live" class="ok" disabled>Live: off</button></div>
+    <div class="row"><button id="mask" class="alt" disabled>Mask: off</button><span id="posted" class="val" style="min-width:6em">posted 0</span></div>
     <div id="status">Hold the phone landscape. Tap Start camera.</div>
   </div>
 </div>
@@ -117,37 +118,47 @@
       F.width = settings.width; F.height = settings.height;
       ov.width = settings.width; ov.height = settings.height;
       status(`camera ${settings.width}×${settings.height} @ ${settings.frameRate || '?'} fps`);
-      ['sample', 'calib', 'intr', 'lock', 'live'].forEach(id => $(id).disabled = false);
+      ['sample', 'calib', 'intr', 'lock', 'live', 'mask'].forEach(id => $(id).disabled = false);
+      $('mask').onclick = () => { maskOn = !maskOn; $('mask').textContent = 'Mask: ' + (maskOn ? 'ON' : 'off'); if (!maskOn) maskImg = null; };
       $('start').disabled = true;
       wake(); syncClock(); loop();
     } catch (e) { status('camera failed: ' + e.message + ' (needs https + permission)', true); }
   };
 
   // ---- detection (docs/WEB.md §3): normalized-chroma box around the sampled color
-  let det = null, buffer = [], liveOn = false;
+  let det = null, buffer = [], liveOn = false, maskOn = false, posted = 0, rawN = 0, rejectWhy = '';
+  const M = document.createElement('canvas'); M.width = AW; M.height = AH; const mctx = M.getContext('2d');
+  let maskImg = null;
   function analyze() {
     actx.drawImage(v, 0, 0, AW, AH);
     const px = actx.getImageData(0, 0, AW, AH).data;
-    if (!color) return null;
+    if (!color) { rejectWhy = 'no color sampled'; return null; }
     const tol = S.tol, r0 = color.r, g0 = color.g;
     let n = 0, sX = 0, sY = 0, minX = AW, maxX = 0, minY = AH, maxY = 0;
+    const wantMask = maskOn; if (wantMask && !maskImg) maskImg = mctx.createImageData(AW, AH);
+    const mp = wantMask ? maskImg.data : null;
     for (let y = 0, i = 0; y < AH; y++) {
       for (let x = 0; x < AW; x++, i += 4) {
         const r = px[i], g = px[i + 1], b = px[i + 2], s = r + g + b + 1;
-        if (s < 120) continue;
-        const rn = r / s, gn = g / s;
-        if (rn > r0 - tol && rn < r0 + tol && gn > g0 - tol && gn < g0 + tol) {
-          n++; sX += x; sY += y; if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y;
+        let hit = false;
+        if (s >= 120) {
+          const rn = r / s, gn = g / s;
+          hit = rn > r0 - tol && rn < r0 + tol && gn > g0 - tol && gn < g0 + tol;
         }
+        if (hit) { n++; sX += x; sY += y; if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
+        if (mp) { mp[i] = 0; mp[i + 1] = hit ? 255 : 0; mp[i + 2] = 0; mp[i + 3] = hit ? 170 : 0; }
       }
     }
-    if (n < S.minpx) return null;
+    rawN = n;
+    if (n < S.minpx) { rejectWhy = `n=${n} < minpx`; return null; }
     const w = (maxX - minX + 1), h = (maxY - minY + 1);
-    if (w > 0.15 * AW || h > 0.15 * AH) return null;        // too big: background, not a ball
+    if (w > 0.15 * AW || h > 0.15 * AH) { rejectWhy = `blob too big (${w}×${h} of ${AW}×${AH})`; return null; }
+    rejectWhy = '';
     return { u: (sX / n + 0.5) * sx, v: (sY / n + 0.5) * sy, n, w: w * sx, h: h * sy };
   }
   function drawOverlay(d) {
     octx.clearRect(0, 0, ov.width, ov.height);
+    if (maskOn && maskImg) { mctx.putImageData(maskImg, 0, 0); octx.drawImage(M, 0, 0, ov.width, ov.height); }
     octx.strokeStyle = '#fff'; octx.lineWidth = 2;
     const cx = ov.width / 2, cy = ov.height / 2;                 // crosshair
     octx.beginPath(); octx.moveTo(cx - 30, cy); octx.lineTo(cx + 30, cy); octx.moveTo(cx, cy - 30); octx.lineTo(cx, cy + 30); octx.stroke();
@@ -162,8 +173,9 @@
     if (now - uiT > 100) {                                      // ~10 Hz UI
       uiT = now; drawOverlay(det);
       if (now - lastFpsT > 1000) { fps = Math.round(frames * 1000 / (now - lastFpsT)); frames = 0; lastFpsT = now; }
-      $('stats').textContent = `${settings.width}×${settings.height} ${fps} fps · ` + (det ? `n=${det.n} u=${det.u.toFixed(0)} v=${det.v.toFixed(0)}` : 'no ball') +
+      $('stats').textContent = `${settings.width}×${settings.height} ${fps} fps · ` + (det ? `n=${det.n} u=${det.u.toFixed(0)} v=${det.v.toFixed(0)}` : `no ball (${rejectWhy})`) +
         (clockOffset === null ? ' · clock: —' : ` · rtt ${(lastRtt * 1000).toFixed(0)}ms`);
+      $('posted').textContent = `posted ${posted}`;
     }
     loop();
   }
@@ -184,7 +196,7 @@
   // ---- POST detections every 500 ms while live (empty batches too)
   setInterval(() => {
     if (!liveOn || clockOffset === null) return;
-    const frames = buffer; buffer = [];
+    const frames = buffer; buffer = []; posted += frames.length;
     fetch(base + '/detections', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ device_id: S.dev || 'unknown', clock_offset: clockOffset, image_size: [settings.width, settings.height],
         fps_reported: settings.frameRate || null, frames }) }).catch(() => {});
