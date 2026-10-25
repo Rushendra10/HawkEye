@@ -13,3 +13,6 @@ ios/**/*.xcuserstate
 .DS_Store
 server/data/dev/
 server/data/dev_server.log
+
+# server: live calibration mirror (per-machine)
+server/data/calibration_latest.json
