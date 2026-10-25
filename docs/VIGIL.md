@@ -24,7 +24,7 @@ diagnostic; no SpO2, no BP number.
 - `vitals.py` — PPG analysis (HR, RR from respiratory modulation, RMSSD/SDNN, perfusion index, SQI),
   capillary refill (exponential recovery after release), complaint red flags, NEWS-style score with reasons.
   Verified on real data: HR 72 (contact finger, 120 fps, SNR 155).
-- `static/patient.html` — join → 30 s pulse check with live waveform → press/relax refill test → results →
+- `static/patient.html` — join → 20 s pulse check with live waveform → press/relax refill test → results →
   15-min countdown; polls `/me` for nurse re-check requests and "find me" glow.
 - `static/board.html` — nurse board: ranked table, sparklines, reasons, Re-check / Find / Seen, QR to join,
   room-breathing panel (reads `/patients.room`).

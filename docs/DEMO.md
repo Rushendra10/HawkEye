@@ -12,7 +12,7 @@
 ## Script (5 min)
 
 - **0:00** "Triage is a snapshot. Waiting is where people get worse unseen. We don't prevent it — we notice it sooner." Slide 2.
-- **0:40** Slide 3, 30 s: the physics. Then: "Let's do it on you." Judge scans the QR, types *chest pain*, finger on camera, flash on. 30 s + 12 s. Their row appears: HR, breathing, HRV, refill, score 2 with "complaint: chest pain" in the reasons. *"That waveform is the same signal as the clip on your finger in a hospital."*
+- **0:40** Slide 3, 30 s: the physics. Then: "Let's do it on you." Judge scans the QR, types *chest pain*, finger on camera, flash on. 20 s + 10 s. Their row appears: HR, breathing, HRV, refill, score 2 with "complaint: chest pain" in the reasons. *"That waveform is the same signal as the clip on your finger in a hospital."*
 - **2:10** Board walk-through: ranking, reasons, trend lines. Teammate: "I checked in 10 minutes ago — resting." She does 30 squats (or runs the stairs beforehand), re-checks on stage: her row jumps to the top, red, *"HR up 38% since arrival (+1), RR 24 (+2)."* Nurse taps **Find** → her phone glows orange in the audience.
 - **3:30** Room camera: breathing rates over the audience's chests. "Hold your breath" → APNEA on one seat in ~8 s.
 - **4:15** Slide 5: honest limits, HawkEye first. Slide 6: what's next. Done.

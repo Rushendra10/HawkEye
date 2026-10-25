@@ -25,7 +25,7 @@ Social Hack 2026 · Connect & Intersect · Rushendra + [teammate]
 - *(Live demo here.)*
 
 ## 5 · Honest limits · what we built first
-- A reassessment aid, not a diagnosis. No SpO2, no BP number. Only what a pulse can show. Needs the patient to do a 45-second check (prompted every 15 min).
+- A reassessment aid, not a diagnosis. No SpO2, no BP number. Only what a pulse can show. Needs the patient to do a 30-second check (prompted every 15 min).
 - First we built **HawkEye**: two phones → 3D ball tracking. Calibration worked (0.3 px); the per-use setup didn't earn its demo. Code in `legacy_hawkeye/`. We kept the stack (Safari pages → Mac → board) and pointed it at something that matters.
 
 ## 6 · What's next (designed, not built)

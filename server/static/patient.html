@@ -33,7 +33,7 @@
 
 <section id="s-join" class="screen active">
   <h1>Vigil</h1>
-  <p>You're in the waiting room. Your phone will keep an eye on you while you wait, and the nurse will see if anything changes. Takes 45 seconds, every 15 minutes.</p>
+  <p>You're in the waiting room. Your phone will keep an eye on you while you wait, and the nurse will see if anything changes. Takes 30 seconds, every 15 minutes.</p>
   <label>Your name or initials</label><input id="name" autocomplete="off">
   <label>Age</label><input id="age" type="number" inputmode="numeric">
   <label>What brings you in today?</label><textarea id="complaint" placeholder="e.g. chest pain since this morning, short of breath"></textarea>
@@ -99,7 +99,7 @@
     for (let i = 0; i < px.length; i += 4) { r += px[i]; g += px[i + 1]; b += px[i + 2]; } const n = px.length / 4;
     return [r / n, g / n, b / n];
   }
-  const PPG_S = 30, PRESS_S = 5, RELAX_S = 7;
+  const PPG_S = 20, PRESS_S = 4, RELAX_S = 6;   // 20 s pulse (HR exact, breathing ±3/min), 10 s refill test
   function drawWave(c, data) {
     const W = c.width = c.clientWidth * devicePixelRatio, H = c.height = 90 * devicePixelRatio, ctx = c.getContext('2d');
     ctx.fillStyle = '#121923'; ctx.fillRect(0, 0, W, H); if (data.length < 3) return;
@@ -128,12 +128,12 @@
   function loop() { if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(frame); else requestAnimationFrame(n => frame(n, null)); }
 
   $('m-start').onclick = async () => {
-    if (!stream) { await openCamera(); $('m-start').textContent = 'Start the 30-second check'; return; }
+    if (!stream) { await openCamera(); $('m-start').textContent = 'Start the 20-second check'; return; }
     frames = []; crtFrames = []; crtRelease = null; phase = 'ppg'; t0 = performance.now(); $('m-start').disabled = true;
     $('m-title').textContent = 'Pulse check'; $('m-help').textContent = 'Keep still. Breathe normally.';
   };
   function startCRT() {
-    phase = 'press'; t0 = performance.now(); $('m-title').textContent = 'Press hard on the lens'; $('m-help').textContent = 'Press your fingertip hard against the lens for 5 seconds — this is the "capillary refill" test nurses do by pressing your fingernail.';
+    phase = 'press'; t0 = performance.now(); $('m-title').textContent = 'Press hard on the lens'; $('m-help').textContent = 'Press your fingertip hard against the lens for 4 seconds — this is the "capillary refill" test nurses do by pressing your fingernail.';
     st('press hard now', 'warn');
   }
   async function finish() {
@@ -150,7 +150,7 @@
     $('r-crt').textContent = C && C.ok ? C.crt_s : '—';
     $('r-msg').textContent = R.ok ? 'The nurse can see this. We\'ll ask you to check again in 15 minutes — keep this page open.' : ('Reading was unclear (' + (R.reason || 'weak signal') + '). Please check again.');
     if (R.wave) drawWave($('w2'), R.wave);
-    phase = 'idle'; $('m-start').disabled = false; $('m-start').textContent = 'Start the 30-second check'; $('m-title').textContent = 'Pulse check';
+    phase = 'idle'; $('m-start').disabled = false; $('m-start').textContent = 'Start the 20-second check'; $('m-title').textContent = 'Pulse check';
     nextDue = Date.now() + 15 * 60 * 1000; show('s-result');
   }
   $('again').onclick = () => show('s-measure');
@@ -158,7 +158,7 @@
   // ---------- waiting: countdown, recheck requests, glow
   let nextDue = 0;
   setInterval(async () => {
-    if (nextDue) { const s = Math.max(0, Math.round((nextDue - Date.now()) / 1000)); $('next').textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; if (s === 0 && $('s-result').classList.contains('active')) { nextDue = 0; alert('Time for your 45-second check.'); show('s-measure'); } }
+    if (nextDue) { const s = Math.max(0, Math.round((nextDue - Date.now()) / 1000)); $('next').textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; if (s === 0 && $('s-result').classList.contains('active')) { nextDue = 0; alert('Time for your 30-second check.'); show('s-measure'); } }
     if (!pid) return;
     try {
       const j = await (await fetch(base + '/me/' + pid, { cache: 'no-store' })).json();
