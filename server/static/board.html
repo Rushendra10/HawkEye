@@ -1,35 +1,99 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<title>HawkEye board</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigil — waiting room</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
-  html, body { margin: 0; height: 100%; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-  canvas { display: block; }
-  #hint { position: fixed; bottom: 6px; left: 8px; font: 13px system-ui; color: #666; background: rgba(255,255,255,.85); padding: 4px 8px; border-radius: 6px; }
+  :root { color-scheme: dark; } * { box-sizing: border-box; }
+  body { margin: 0; background: #0b0f14; color: #e8eef5; font: 16px -apple-system, system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 18px; padding: 14px 22px; border-bottom: 1px solid #1d2733; }
+  header h1 { font-size: 22px; margin: 0; } header .meta { color: #aab6c3; }
+  header .spacer { flex: 1; }
+  #qr { width: 84px; height: 84px; background: #fff; border-radius: 8px; padding: 4px; }
+  main { padding: 14px 22px; display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; color: #aab6c3; font-weight: 500; font-size: 13px; padding: 6px 10px; border-bottom: 1px solid #1d2733; }
+  td { padding: 10px; border-bottom: 1px solid #141c26; vertical-align: middle; }
+  tr.p { background: #121923; } tr.p.hi { background: #2a1416; } tr.p.mid { background: #2a2214; }
+  .score { font-size: 26px; font-weight: 800; width: 2em; text-align: center; border-radius: 10px; padding: 4px 0; }
+  .s0 { background: #163d2a; color: #4ade80; } .s1 { background: #3d3416; color: #ffd166; } .s2 { background: #3d1616; color: #ff6b6b; }
+  .name { font-weight: 700; font-size: 18px; } .sub { color: #aab6c3; font-size: 13px; }
+  .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; } .k { color: #aab6c3; font-size: 12px; }
+  .bad { color: #ff6b6b; } .warn { color: #ffd166; }
+  .reasons { color: #ffd166; font-size: 13px; }
+  canvas.spark { width: 120px; height: 36px; }
+  button { font-size: 14px; padding: 8px 10px; border-radius: 8px; border: 0; background: #223041; color: #fff; margin-right: 6px; }
+  button.pri { background: #2b6cff; } button.on { background: #ff7a00; color: #000; }
+  aside .card { background: #121923; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+  aside h3 { margin: 0 0 8px; font-size: 15px; color: #aab6c3; font-weight: 500; }
+  .seat { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1d2733; }
+  .legend { color: #aab6c3; font-size: 13px; line-height: 1.5; }
+  #empty { color: #aab6c3; padding: 30px; text-align: center; }
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div id="hint"></div>
+<header>
+  <h1>Vigil · waiting room</h1>
+  <span class="meta" id="meta">—</span>
+  <span class="spacer"></span>
+  <div><div class="sub">patients: scan to check in</div><div class="sub" id="url"></div></div>
+  <canvas id="qr"></canvas>
+  <button onclick="fetch('/reset',{method:'POST'})">Reset</button>
+</header>
+<main>
+  <div>
+    <table>
+      <thead><tr><th></th><th>Patient</th><th>Heart rate</th><th>Breathing</th><th>HRV</th><th>Refill</th><th>Trend</th><th>Last check</th><th>Why</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div id="empty">No patients yet. Scan the QR code.</div>
+  </div>
+  <aside>
+    <div class="card"><h3>Room camera — breathing</h3><div id="room"><span class="sub">no camera running</span></div></div>
+    <div class="card"><h3>How the score works</h3><div class="legend">NEWS-style points for heart rate and breathing rate · +1 for a 20% rise in HR or +4 breaths since arrival · +2 for capillary refill &gt; 2 s · +2 for a red-flag complaint · +1 for pain ≥ 8.<br>Sorted by score, then by who has waited longest since their last check.</div></div>
+  </aside>
+</main>
 <script>
-  // 10 x 7 squares = 9 x 6 inner corners (OpenCV pattern size (9, 6)).
-  const COLS = 10, ROWS = 7;
-  const c = document.getElementById('c'), ctx = c.getContext('2d');
-  function draw() {
-    const margin = 0.06;
-    const sq = Math.floor(Math.min(window.innerWidth * (1 - margin) / COLS, window.innerHeight * (1 - margin) / ROWS));
-    c.width = sq * COLS; c.height = sq * ROWS;
-    for (let r = 0; r < ROWS; r++) for (let k = 0; k < COLS; k++) {
-      ctx.fillStyle = ((r + k) % 2 === 0) ? '#000' : '#fff';
-      ctx.fillRect(k * sq, r * sq, sq, sq);
-    }
-    document.getElementById('hint').textContent =
-      `Fullscreen (⌃⌘F), brightness max, lid vertical. Board is ${COLS}×${ROWS} squares (9×6 inner corners). ` +
-      `Each square is ${sq}px — measure the full board width with a ruler and divide by ${COLS}; that is square_size_m. Press H to hide.`;
+(() => {
+  const $ = id => document.getElementById(id);
+  const patientURL = location.origin + '/static/patient.html';
+  $('url').textContent = patientURL.replace('https://', '');
+  QRCode.toCanvas($('qr'), patientURL, { width: 84, margin: 1 });
+  const ago = s => s < 60 ? `${Math.round(s)} s` : `${Math.floor(s / 60)} min`;
+  function spark(c, series) {
+    const W = c.width = 120 * devicePixelRatio, H = c.height = 36 * devicePixelRatio, ctx = c.getContext('2d'); ctx.clearRect(0, 0, W, H);
+    const ys = series.map(p => p[1]).filter(y => y != null); if (ys.length < 2) { ctx.fillStyle = '#aab6c3'; ctx.font = `${11 * devicePixelRatio}px system-ui`; ctx.fillText(ys.length ? 'first reading' : '', 2, H / 2 + 4); return; }
+    const lo = Math.min(...ys) - 2, hi = Math.max(...ys) + 2; ctx.strokeStyle = ys[ys.length - 1] > ys[0] * 1.15 ? '#ff6b6b' : '#4ade80'; ctx.lineWidth = 2 * devicePixelRatio; ctx.beginPath();
+    ys.forEach((y, i) => { const X = 4 + i / (ys.length - 1) * (W - 8), Y = H - 4 - (y - lo) / (hi - lo) * (H - 8); i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); }); ctx.stroke();
   }
-  window.addEventListener('resize', draw); draw();
-  document.addEventListener('keydown', e => { if (e.key.toLowerCase() === 'h') document.getElementById('hint').style.display = 'none'; });
+  async function refresh() {
+    let j; try { j = await (await fetch('/patients', { cache: 'no-store' })).json(); } catch (e) { return; }
+    const now = j.server_time; const rows = $('rows'); rows.innerHTML = ''; $('empty').style.display = j.patients.length ? 'none' : 'block';
+    $('meta').textContent = `${j.patients.length} waiting · ${j.patients.filter(p => p.score >= 3).length} flagged · ${new Date().toLocaleTimeString()}`;
+    for (const p of j.patients) {
+      const L = p.last || {}; const cls = p.score >= 3 ? 'hi' : p.score >= 1 ? 'mid' : ''; const scls = p.score >= 3 ? 's2' : p.score >= 1 ? 's1' : 's0';
+      const tr = document.createElement('tr'); tr.className = 'p ' + cls;
+      const unread = p.unreadable || (p.last && !p.last.ok);
+      tr.innerHTML = `<td><div class="score ${scls}">${p.score}</div></td>
+        <td><div class="name">${p.name}${p.age ? ', ' + p.age : ''}</div><div class="sub">${p.complaint || ''}${p.pain != null ? ' · pain ' + p.pain + '/10' : ''}</div><div class="sub">${(p.flags || []).map(f => '<b class="warn">' + f + '</b>').join(' ')}</div></td>
+        <td><span class="v ${L.hr > 110 || L.hr < 50 ? 'bad' : L.hr > 90 ? 'warn' : ''}">${L.hr ?? '—'}</span><div class="k">bpm</div></td>
+        <td><span class="v ${L.rr > 24 || L.rr < 9 ? 'bad' : L.rr > 20 ? 'warn' : ''}">${L.rr ?? '—'}</span><div class="k">/min</div></td>
+        <td><span class="v">${L.rmssd_ms ?? '—'}</span><div class="k">ms</div></td>
+        <td><span class="v ${L.crt_s > 2 ? 'bad' : ''}">${L.crt_s ?? '—'}</span><div class="k">s</div></td>
+        <td><canvas class="spark"></canvas></td>
+        <td><div>${p.last ? ago(now - p.last.t) + ' ago' : 'not yet'}</div><div class="sub">${p.n_checks} check${p.n_checks === 1 ? '' : 's'} · ${unread ? '<span class="bad">unreadable</span>' : (L.sqi != null ? 'quality ' + Math.round(L.sqi * 100) + '%' : '')}${p.recheck_due ? ' · <span class="warn">recheck due</span>' : ''}</div></td>
+        <td class="reasons">${(p.reasons || []).join('<br>')}</td>
+        <td><button class="pri" data-a="recheck">Re-check</button><button data-a="glow" class="${p.glow ? 'on' : ''}">Find</button><button data-a="seen">Seen</button></td>`;
+      spark(tr.querySelector('canvas'), p.hr_series);
+      tr.querySelectorAll('button').forEach(b => b.onclick = () => fetch(`/${b.dataset.a}/${p.id}`, { method: 'POST' }).then(refresh));
+      rows.appendChild(tr);
+    }
+    const seats = Object.entries(j.room || {}); $('room').innerHTML = seats.length ? seats.map(([k, s]) => `<div class="seat"><span>${k}</span><span class="v ${s.rr > 24 ? 'bad' : s.rr > 20 ? 'warn' : ''}">${s.rr != null ? Math.round(s.rr) : '—'} <span class="k">/min</span></span></div>`).join('') : '<span class="sub">no camera running</span>';
+  }
+  refresh(); setInterval(refresh, 2000);
+})();
 </script>
 </body>
 </html>

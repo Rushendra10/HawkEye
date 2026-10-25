@@ -83,9 +83,14 @@ class H(SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    ctx.load_cert_chain(os.path.join(HERE, "certs", "cert.pem"), os.path.join(HERE, "certs", "key.pem"))
-    httpd = ThreadingHTTPServer(("0.0.0.0", 8443), H)
-    httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True)
-    print("dev_server: https://0.0.0.0:8443/static/capture.html  (logs -> data/dev/)")
+    import sys
+    if "--http" in sys.argv:   # plain HTTP on 8000: for the Mac's own browser (http://localhost is a secure context)
+        httpd = ThreadingHTTPServer(("0.0.0.0", 8000), H)
+        print("dev_server: http://localhost:8000/static/  (logs -> data/dev/)")
+    else:
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ctx.load_cert_chain(os.path.join(HERE, "certs", "cert.pem"), os.path.join(HERE, "certs", "key.pem"))
+        httpd = ThreadingHTTPServer(("0.0.0.0", 8443), H)
+        httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True)
+        print("dev_server: https://0.0.0.0:8443/static/capture.html  (logs -> data/dev/)")
     httpd.serve_forever()

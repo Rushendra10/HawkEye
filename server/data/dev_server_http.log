@@ -1,0 +1,381 @@
+127.0.0.1 - - [24/Oct/2026 15:46:04] "GET /static/vitals_test.html HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:46:04] "GET /static/vitals_test.html HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 57812)
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 719, in send_head
+    f = open(path, 'rb')
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/rushendra/Desktop/Social Hack/HawkEye/server/favicon.ico'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 683, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 31, in __init__
+    super().__init__(*a, directory=HERE, **k)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 660, in __init__
+    super().__init__(*args, **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 747, in __init__
+    self.handle()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 434, in handle
+    self.handle_one_request()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 422, in handle_one_request
+    method()
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 47, in do_GET
+    return super().do_GET()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 664, in do_GET
+    f = self.send_head()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 721, in send_head
+    self.send_error(HTTPStatus.NOT_FOUND, "File not found")
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 464, in send_error
+    self.log_error("code %d, message %s", code, message)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 566, in log_error
+    self.log_message(format, *args)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 80, in log_message
+    if "/detections" in (args[0] if args else ""):
+TypeError: argument of type 'HTTPStatus' is not iterable
+----------------------------------------
+127.0.0.1 - - [24/Oct/2026 15:47:25] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:26] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:26] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:27] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:27] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:28] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:28] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:29] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:29] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:30] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:30] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:31] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:31] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:32] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:32] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:33] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:33] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:34] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:34] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:35] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:35] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:36] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:36] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:37] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:37] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:38] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:38] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:39] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:39] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:40] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:40] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:41] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:41] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:42] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:42] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:43] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:43] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:44] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:44] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:45] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:45] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:46] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:46] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:47] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:47] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:48] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:48] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:49] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:49] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:47:50] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:26] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:27] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:27] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:28] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:28] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:29] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:29] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:30] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:30] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:31] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:31] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:32] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:32] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:33] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:33] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:34] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:34] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:35] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:35] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:36] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:36] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:37] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:37] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:38] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:38] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:39] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:39] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:40] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:40] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:41] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:41] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:42] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:42] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:43] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:43] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:44] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:44] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:45] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:45] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:46] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:46] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:47] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:47] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:48] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:48] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 15:51:49] "POST /vitals HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:36:00] "GET /static/breath_test.html HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:36:00] "GET /static/breath_test.html HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 58253)
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 719, in send_head
+    f = open(path, 'rb')
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/rushendra/Desktop/Social Hack/HawkEye/server/favicon.ico'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 683, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 31, in __init__
+    super().__init__(*a, directory=HERE, **k)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 660, in __init__
+    super().__init__(*args, **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 747, in __init__
+    self.handle()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 434, in handle
+    self.handle_one_request()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 422, in handle_one_request
+    method()
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 47, in do_GET
+    return super().do_GET()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 664, in do_GET
+    f = self.send_head()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 721, in send_head
+    self.send_error(HTTPStatus.NOT_FOUND, "File not found")
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 464, in send_error
+    self.log_error("code %d, message %s", code, message)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 566, in log_error
+    self.log_message(format, *args)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 80, in log_message
+    if "/detections" in (args[0] if args else ""):
+TypeError: argument of type 'HTTPStatus' is not iterable
+----------------------------------------
+127.0.0.1 - - [24/Oct/2026 16:37:09] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:09] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:10] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:10] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:11] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:11] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:12] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:12] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:13] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:13] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:14] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:14] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:15] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:15] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:16] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:16] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:17] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:17] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:18] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:18] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:19] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:19] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:20] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:20] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:21] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:21] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:22] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:22] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:23] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:23] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:24] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:24] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:25] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:25] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:26] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:26] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:27] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:27] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:28] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:28] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:29] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:29] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:30] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:30] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:31] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:31] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:32] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:32] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:33] "POST /breath HTTP/1.1" 200 -
+127.0.0.1 - - [24/Oct/2026 16:37:53] "GET /static/breath_test.html HTTP/1.1" 304 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 58365)
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 719, in send_head
+    f = open(path, 'rb')
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/rushendra/Desktop/Social Hack/HawkEye/server/favicon.ico'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 683, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 31, in __init__
+    super().__init__(*a, directory=HERE, **k)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 660, in __init__
+    super().__init__(*args, **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 747, in __init__
+    self.handle()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 434, in handle
+    self.handle_one_request()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 422, in handle_one_request
+    method()
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 47, in do_GET
+    return super().do_GET()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 664, in do_GET
+    f = self.send_head()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 721, in send_head
+    self.send_error(HTTPStatus.NOT_FOUND, "File not found")
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 464, in send_error
+    self.log_error("code %d, message %s", code, message)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 566, in log_error
+    self.log_message(format, *args)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 80, in log_message
+    if "/detections" in (args[0] if args else ""):
+TypeError: argument of type 'HTTPStatus' is not iterable
+----------------------------------------
+127.0.0.1 - - [24/Oct/2026 16:38:12] "GET /static/breath_test.html HTTP/1.1" 304 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 58373)
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 719, in send_head
+    f = open(path, 'rb')
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/rushendra/Desktop/Social Hack/HawkEye/server/favicon.ico'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 683, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 31, in __init__
+    super().__init__(*a, directory=HERE, **k)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 660, in __init__
+    super().__init__(*args, **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 747, in __init__
+    self.handle()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 434, in handle
+    self.handle_one_request()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 422, in handle_one_request
+    method()
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 47, in do_GET
+    return super().do_GET()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 664, in do_GET
+    f = self.send_head()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 721, in send_head
+    self.send_error(HTTPStatus.NOT_FOUND, "File not found")
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 464, in send_error
+    self.log_error("code %d, message %s", code, message)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 566, in log_error
+    self.log_message(format, *args)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 80, in log_message
+    if "/detections" in (args[0] if args else ""):
+TypeError: argument of type 'HTTPStatus' is not iterable
+----------------------------------------
+127.0.0.1 - - [24/Oct/2026 20:50:31] "GET /static/breath_test.html HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 58649)
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 719, in send_head
+    f = open(path, 'rb')
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/rushendra/Desktop/Social Hack/HawkEye/server/favicon.ico'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 683, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 31, in __init__
+    super().__init__(*a, directory=HERE, **k)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 660, in __init__
+    super().__init__(*args, **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 747, in __init__
+    self.handle()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 434, in handle
+    self.handle_one_request()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 422, in handle_one_request
+    method()
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 47, in do_GET
+    return super().do_GET()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 664, in do_GET
+    f = self.send_head()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 721, in send_head
+    self.send_error(HTTPStatus.NOT_FOUND, "File not found")
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 464, in send_error
+    self.log_error("code %d, message %s", code, message)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 566, in log_error
+    self.log_message(format, *args)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 80, in log_message
+    if "/detections" in (args[0] if args else ""):
+TypeError: argument of type 'HTTPStatus' is not iterable
+----------------------------------------
+127.0.0.1 - - [24/Oct/2026 20:52:32] "GET /static/breath_test.html HTTP/1.1" 304 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 58660)
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 719, in send_head
+    f = open(path, 'rb')
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/rushendra/Desktop/Social Hack/HawkEye/server/favicon.ico'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 683, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 360, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 31, in __init__
+    super().__init__(*a, directory=HERE, **k)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 660, in __init__
+    super().__init__(*args, **kwargs)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socketserver.py", line 747, in __init__
+    self.handle()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 434, in handle
+    self.handle_one_request()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 422, in handle_one_request
+    method()
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 47, in do_GET
+    return super().do_GET()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 664, in do_GET
+    f = self.send_head()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 721, in send_head
+    self.send_error(HTTPStatus.NOT_FOUND, "File not found")
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 464, in send_error
+    self.log_error("code %d, message %s", code, message)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/server.py", line 566, in log_error
+    self.log_message(format, *args)
+  File "/Users/rushendra/Desktop/Social Hack/HawkEye/server/dev_server.py", line 80, in log_message
+    if "/detections" in (args[0] if args else ""):
+TypeError: argument of type 'HTTPStatus' is not iterable
+----------------------------------------
