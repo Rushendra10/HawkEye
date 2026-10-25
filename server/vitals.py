@@ -236,6 +236,10 @@ def risk(p: Dict, checks: List[Dict]) -> Dict:
     hr, rr = last.get("hr"), last.get("rr")
     if hr is None or rr is None:
         return {}
+    live = p.get("live") or {}
+    parts = []
+    if live.get("rr") is not None and (live.get("snr") or 0) >= 3 and live["rr"] > rr:
+        rr = float(live["rr"]); parts.append("camera breathing")      # the camera is now, the finger check may be minutes old
     ref = first                                   # the check ~3 h before the latest one, else the first
     for c in checks:
         if last["t"] - c["t"] >= 3 * 3600:
@@ -247,7 +251,17 @@ def risk(p: Dict, checks: List[Dict]) -> Dict:
     for f, mu, sd, c in zip(m["features"], m["mean"], m["scale"], m["coef"]):
         v = feats.get(f)
         logit += 0.0 if v is None else c * (v - mu) / sd
-    out = {"risk_logit": round(float(logit), 3), "risk_prob": round(float(1 / (1 + math.exp(-logit))), 3)}
+    # Evidence the model never saw, added as fixed log-odds bumps (conservative, from the sepsis literature:
+    # prolonged refill, low HRV and weak perfusion each roughly double the odds of deterioration).
+    crt = last.get("crt_s")
+    if crt is not None and crt > 3.0: logit += 0.7; parts.append(f"refill {crt} s")
+    elif crt is not None and crt > 2.0: logit += 0.4; parts.append(f"refill {crt} s")
+    if last.get("rmssd_ms") is not None and last["rmssd_ms"] < 20: logit += 0.3; parts.append("low HRV")
+    if last.get("pi") is not None and last["pi"] < 0.3: logit += 0.4; parts.append("weak perfusion")
+    if live.get("apnea"): logit += 1.0; parts.append("camera: no breathing")
+    severe = {"chest pain", "breathing", "stroke", "bleeding", "syncope", "seizure", "anaphylaxis", "overdose", "infant", "confusion"}
+    if any(f in severe for f in p.get("flags", [])): logit += 0.5; parts.append("complaint")
+    out = {"risk_logit": round(float(logit), 3), "risk_prob": round(float(1 / (1 + math.exp(-logit))), 3), "risk_parts": parts}
     grid = m.get("logit_percentiles")
     if grid:
         out["risk"] = int(min(100, np.searchsorted(np.array(grid), logit)))

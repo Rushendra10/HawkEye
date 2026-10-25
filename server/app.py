@@ -207,7 +207,7 @@ def patients():
                     "seat": p.get("seat"), "live": live,
                     "joined": p["joined"], "last": last, "n_checks": len(p["checks"]), "recheck_requested": p["recheck_requested"],
                     "glow": p["glow"], "hr_series": [[c["t"], c.get("hr")] for c in ok_checks], "rr_series": [[c["t"], c.get("rr")] for c in ok_checks],
-                    **sc, **vitals.risk(p, ok_checks)})
+                    **sc, **vitals.risk({**p, "live": live}, ok_checks)})
     out.sort(key=lambda x: (-x["score"], -(now - (x["last"]["t"] if x["last"] else x["joined"]))))
     room = {k: {**s, "patient": next((q["name"] for q in PATIENTS.values() if q.get("seat") == k), None)} for k, s in ROOM.items()}
     return {"server_time": now, "patients": out, "room": room}

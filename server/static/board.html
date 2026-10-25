@@ -74,7 +74,7 @@
   </div>
   <aside>
     <div class="panel"><h3>Room camera</h3><div class="body" id="room"><span class="sub">no camera running</span></div></div>
-    <div class="panel"><h3>Score</h3><div class="body legend">NEWS points for heart rate and breathing rate. +1 for a 20% rise in heart rate or 4 more breaths since arrival. +2 for capillary refill over 2 s. +2 for a red-flag complaint. +1 for pain 8 or more.<br><br>Sorted by score, then by who has waited longest since their last check. Re-checks are asked for every 15 minutes.<br><br><b>Risk</b> is a logistic model trained on 3,964 PhysioNet ICU patients (CinC 2019): heart rate, breathing, age and change since arrival, predicting sepsis within 6 h. Shown as a percentile of the training hours. Test AUROC 0.67 against 0.64 for the NEWS bands. It informs, it does not sort.</div></div>
+    <div class="panel"><h3>Score</h3><div class="body legend">NEWS points for heart rate and breathing rate. +1 for a 20% rise in heart rate or 4 more breaths since arrival. +2 for capillary refill over 2 s. +2 for a red-flag complaint. +1 for pain 8 or more.<br><br>Sorted by score, then by who has waited longest since their last check. Re-checks are asked for every 15 minutes.<br><br><b>Risk</b> starts from a logistic model trained on 3,964 PhysioNet ICU patients (CinC 2019): heart rate, breathing (live camera breathing when higher), age and change since arrival, predicting sepsis within 6 h. Test AUROC 0.67 against 0.64 for the NEWS bands. Evidence the model never saw raises it by fixed amounts and is listed under the number: refill over 2 s, HRV under 20 ms, weak perfusion, camera apnea, a red-flag complaint. Shown as a percentile of the training hours. It informs, it does not sort.</div></div>
   </aside>
 </main>
 <script>
@@ -111,7 +111,7 @@
         <td><span class="v ${L.rr > 24 || L.rr < 9 ? 'bad' : L.rr > 20 ? 'warn' : ''}">${L.rr ?? '–'}</span> <span class="k">/min</span>${p.live ? `<div class="sub ${p.live.apnea || p.live.rr > 24 ? 'bad' : ''}">camera ${p.live.apnea ? 'no breathing' : (p.live.rr != null ? Math.round(p.live.rr) + '/min' : 'reading')}</div>` : (p.seat ? `<div class="sub">${esc(p.seat)}, camera off</div>` : '')}</td>
         <td><span class="v">${L.rmssd_ms ?? '–'}</span> <span class="k">ms</span></td>
         <td><span class="v ${L.crt_s > 2 ? 'bad' : ''}">${L.crt_s ?? '–'}</span> <span class="k">s</span></td>
-        <td><span class="v ${p.risk >= 90 ? 'bad' : p.risk >= 75 ? 'warn' : ''}">${p.risk ?? '–'}</span> <span class="k">pct</span></td>
+        <td><span class="v ${p.risk >= 90 ? 'bad' : p.risk >= 75 ? 'warn' : ''}">${p.risk ?? '–'}</span> <span class="k">pct</span>${(p.risk_parts || []).length ? `<div class="sub">+ ${p.risk_parts.map(esc).join(', ')}</div>` : ''}</td>
         <td><canvas class="spark"></canvas></td>
         <td><div>${p.last ? ago(now - p.last.t) : 'not yet'}</div><div class="sub">${p.n_checks} check${p.n_checks === 1 ? '' : 's'}${unread ? ' · <span class="bad">unreadable</span>' : (L.sqi != null ? ' · quality ' + Math.round(L.sqi * 100) + '%' : '')}${p.recheck_due ? ' · <span class="warn">re-check due</span>' : ''}</div></td>
         <td class="reasons">${(p.reasons || []).map(esc).join('<br>')}</td>
