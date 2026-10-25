@@ -25,6 +25,14 @@ from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 app.mount("/static", StaticFiles(directory=os.path.join(HERE, "static")), name="static")
 
+
+@app.middleware("http")
+async def no_cache(request: Request, call_next):
+    """Phones must always get the current page, not Safari's cached copy from an hour ago."""
+    resp = await call_next(request)
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
+
 PATIENTS: Dict[str, Dict[str, Any]] = {}
 ROOM: Dict[str, Dict[str, Any]] = {}      # breathing rates from the room camera, keyed by seat label
 
