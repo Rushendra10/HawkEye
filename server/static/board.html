@@ -78,7 +78,7 @@
   </div>
   <aside>
     <div class="panel"><h3>Room camera</h3><div class="body" id="room"><span class="sub">no camera running</span></div></div>
-    <div class="panel"><h3>Score</h3><div class="body legend">NEWS points for heart rate and breathing rate. +1 for a 20% rise in heart rate or 4 more breaths since arrival. +2 for capillary refill over 2 s. +2 for a red-flag complaint. +1 for pain 8 or more.<br><br>Sorted by score, then by who has waited longest since their last check. Re-checks are asked for every 15 minutes.<br><br><b>Risk</b> starts from a logistic model trained on 3,964 PhysioNet ICU patients (CinC 2019): heart rate, breathing (live camera breathing when higher), age and change since arrival, predicting sepsis within 6 h. Test AUROC 0.67 against 0.64 for the NEWS bands. Evidence the model never saw raises it by fixed amounts and is listed under the number: refill over 2 s, HRV under 20 ms, weak perfusion, camera apnea, a red-flag complaint. Shown as a percentile of the training hours. It informs, it does not sort.</div></div>
+    <div class="panel"><h3>Score</h3><div class="body legend"><b>Score</b>: NEWS points for heart rate and breathing, plus trend since arrival, slow refill, red-flag complaint, camera findings. Every point has its reason. Decides the order.<br><br><b>Risk</b>: percentile from a model trained on 3,964 PhysioNet ICU patients (sepsis within 6 h), raised by refill, HRV, perfusion and camera evidence listed under it. Informs, does not sort.</div></div>
   </aside>
 </main>
 <script>
