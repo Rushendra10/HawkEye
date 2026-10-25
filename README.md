@@ -1,4 +1,4 @@
-# Vigil — the waiting room gets a monitor
+# Vigil , the waiting room gets a monitor
 
 Triage is a snapshot at arrival. Waiting is where people get worse unseen. Vigil turns every phone in
 an ER waiting room into the monitor that notices.

@@ -1,8 +1,8 @@
-# Demo — Vigil
+# Demo , Vigil
 
 ## Setup (10 min, in this order)
 
-1. Hotspot on (Rushendra's phone). Mac + teammate's phone joined. Mac IP = `172.20.10.2` (check `ipconfig getifaddr en0`; if different, `mkcert` a new cert — 10 s — and set `VIGIL_HOST`).
+1. Hotspot on (Rushendra's phone). Mac + teammate's phone joined. Mac IP = `172.20.10.2` (check `ipconfig getifaddr en0`; if different, `mkcert` a new cert , 10 s , and set `VIGIL_HOST`).
 2. Mac: `cd server && source .venv/bin/activate && uvicorn app:app --host 0.0.0.0 --port 8443 --ssl-certfile certs/cert.pem --ssl-keyfile certs/key.pem`
 3. Projector: `https://localhost:8443/` (accept the cert warning once, or `mkcert -install`). Press **Reset**.
 4. Room camera: teammate's phone on a stand facing the audience, `https://172.20.10.2:8443/static/room.html`, Start (rear), tap 3–4 chests. (Or the Mac webcam at `https://localhost:8443/static/room.html`.)
@@ -11,9 +11,9 @@
 
 ## Script (5 min)
 
-- **0:00** "Triage is a snapshot. Waiting is where people get worse unseen. We don't prevent it — we notice it sooner." Slide 2.
+- **0:00** "Triage is a snapshot. Waiting is where people get worse unseen. We don't prevent it , we notice it sooner." Slide 2.
 - **0:40** Slide 3, 30 s: the physics. Then: "Let's do it on you." Judge scans the QR, types *chest pain*, finger on camera, flash on. 20 s + 10 s. Their row appears: HR, breathing, HRV, refill, score 2 with "complaint: chest pain" in the reasons. *"That waveform is the same signal as the clip on your finger in a hospital."*
-- **2:10** Board walk-through: ranking, reasons, trend lines. Teammate: "I checked in 10 minutes ago — resting." She does 30 squats (or runs the stairs beforehand), re-checks on stage: her row jumps to the top, red, *"HR up 38% since arrival (+1), RR 24 (+2)."* Nurse taps **Find** → her phone glows orange in the audience.
+- **2:10** Board walk-through: ranking, reasons, trend lines. Teammate: "I checked in 10 minutes ago , resting." She does 30 squats (or runs the stairs beforehand), re-checks on stage: her row jumps to the top, red, *"HR up 38% since arrival (+1), RR 24 (+2)."* Nurse taps **Find** → her phone glows orange in the audience.
 - **3:30** Room camera: breathing rates over the audience's chests. "Hold your breath" → APNEA on one seat in ~8 s.
 - **4:15** Slide 5: honest limits, HawkEye first. Slide 6: what's next. Done.
 

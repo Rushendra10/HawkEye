@@ -9,11 +9,9 @@
   .slide { display: none; min-height: 100vh; box-sizing: border-box; padding: 9vh 10vw; }
   .slide.active { display: flex; flex-direction: column; justify-content: center; }
   h1 { font-size: 7vh; font-weight: 600; margin: 0 0 4vh; line-height: 1.15; }
-  p, li { font-size: 3.6vh; line-height: 1.45; margin: 0 0 2.2vh; }
-  ul { padding-left: 1.1em; margin: 0; }
-  .src { font-size: 2.2vh; color: #555; margin: -1.2vh 0 3vh; }
-  .stat { font-size: 6.5vh; font-weight: 600; margin: 0; line-height: 1.1; }
-  .mono { font-family: ui-monospace, Menlo, monospace; }
+  p { font-size: 3.6vh; line-height: 1.45; margin: 0 0 2.2vh; }
+  .stat { font-size: 6vh; font-weight: 600; margin: 3vh 0 0.6vh; line-height: 1.1; }
+  .src { font-size: 2.2vh; color: #555; margin: 0 0 1vh; }
   svg text { font-family: inherit; }
   .hint { position: fixed; bottom: 2vh; right: 2vw; font-size: 1.8vh; color: #aaa; }
   @media print {
@@ -25,85 +23,75 @@
 <body>
 
 <section class="slide active">
-  <h1>Connect &amp; Intersect</h1>
-  <p><b>Connect:</b> every phone in a waiting room → one nurse.</p>
-  <p><b>Intersect:</b> the moment a patient gets worse &nbsp;×&nbsp; the moment someone notices.</p>
+  <h1>Connect and Intersect</h1>
+  <p><b>Connect:</b> every phone in a waiting room to one nurse.</p>
+  <p><b>Intersect:</b> the moment a patient gets worse and the moment someone notices.</p>
   <p>Today those two moments are hours apart.</p>
-  <p style="margin-top:5vh"><b>Vigil</b> — the waiting room gets a monitor.</p>
+  <p style="margin-top:5vh"><b>Vigil.</b> The waiting room gets a monitor.</p>
 </section>
 
 <section class="slide">
   <h1>Triage is a snapshot.</h1>
-  <p>Two minutes at arrival: "stable — wait."</p>
-  <p>Then hours in a chair. Re-checks while waiting are local policy, often hours apart, and audits find them missed.</p>
-  <p>Early sepsis, slow bleeding, an evolving heart attack: the body compensates, then it doesn't.</p>
+  <p>Two minutes at arrival: stable, wait.</p>
+  <p>Then hours in a chair. Re-checks while waiting are local policy, hours apart, and audits find them missed.</p>
+  <p>Early sepsis, slow bleeding, a heart attack in progress: the body compensates, then it doesn't.</p>
   <p><b>Waiting is where people get worse unseen.</b></p>
 </section>
 
 <section class="slide">
   <h1>The cost of not noticing</h1>
   <p class="stat">23,003 excess deaths</p>
-  <p>England, 2022, associated with 12-hour-plus waits in emergency departments.</p>
-  <p class="src">Royal College of Emergency Medicine, 2023 (1.66 million patients waited 12 h+)</p>
-  <p class="stat">1 extra death per 82 patients</p>
-  <p>who wait 6–8 hours. Mortality rises steadily after hour 5.</p>
-  <p class="src">Jones et al., Emergency Medicine Journal 2022 — 5.2 million patients</p>
-  <p class="stat">+4% odds of death per hour</p>
+  <p>England, 2022, linked to waits over 12 hours in emergency departments.</p>
+  <p class="src">Royal College of Emergency Medicine, 2023</p>
+  <p class="stat">1 extra death for every 82 patients</p>
+  <p>who wait 6 to 8 hours. Risk rises steadily after hour 5.</p>
+  <p class="src">Jones et al., Emergency Medicine Journal, 2022. 5.2 million patients</p>
+  <p class="stat">4% higher odds of death per hour</p>
   <p>of delay in treating sepsis.</p>
-  <p class="src">Seymour et al., New England Journal of Medicine 2017 — 49,331 patients</p>
-  <p class="stat">1 in 50 leave without being seen</p>
-  <p>doubled since 2017; 1 in 10 at the worst hospitals. ~140 million US ER visits a year.</p>
-  <p class="src">Janke et al., JAMA Network Open 2022; CDC NHAMCS 2021</p>
+  <p class="src">Seymour et al., New England Journal of Medicine, 2017. 49,331 patients</p>
 </section>
 
 <section class="slide">
   <h1>What we built</h1>
-  <svg viewBox="0 0 1200 420" width="100%" style="max-height:60vh" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 1200 400" width="100%" style="max-height:62vh" xmlns="http://www.w3.org/2000/svg">
     <defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#000"/></marker></defs>
     <g fill="none" stroke="#000" stroke-width="2">
-      <rect x="20" y="60" width="330" height="200" rx="6"/>
-      <rect x="435" y="60" width="330" height="200" rx="6"/>
-      <rect x="850" y="60" width="330" height="200" rx="6"/>
-      <rect x="435" y="300" width="330" height="100" rx="6"/>
-      <line x1="350" y1="160" x2="433" y2="160" marker-end="url(#a)"/>
-      <line x1="765" y1="160" x2="848" y2="160" marker-end="url(#a)"/>
-      <line x1="765" y1="350" x2="1015" y2="350" marker-end="url(#a)"/>
-      <line x1="1015" y1="350" x2="1015" y2="262" marker-end="url(#a)"/>
+      <rect x="20" y="40" width="340" height="230" rx="6"/>
+      <rect x="430" y="40" width="340" height="230" rx="6"/>
+      <rect x="840" y="40" width="340" height="230" rx="6"/>
+      <rect x="430" y="310" width="340" height="80" rx="6"/>
+      <line x1="360" y1="155" x2="428" y2="155" marker-end="url(#a)"/>
+      <line x1="770" y1="155" x2="838" y2="155" marker-end="url(#a)"/>
+      <path d="M770,350 L1010,350 L1010,272" marker-end="url(#a)"/>
     </g>
-    <g font-size="26" fill="#000">
-      <text x="40" y="100" font-weight="600">Patient's phone</text>
-      <text x="40" y="145">scan a QR, no app</text>
-      <text x="40" y="185">20 s fingertip on camera, flash on</text>
-      <text x="40" y="225">4 s press, 6 s relax</text>
-      <text x="455" y="100" font-weight="600">Laptop</text>
-      <text x="455" y="145">pulse waveform → heart rate, breathing,</text>
-      <text x="455" y="185">HRV, perfusion, capillary refill</text>
-      <text x="455" y="225">score + trend since arrival</text>
-      <text x="870" y="100" font-weight="600">Nurse board</text>
-      <text x="870" y="145">everyone, ranked, with reasons</text>
-      <text x="870" y="185">re-check · find · seen</text>
-      <text x="870" y="225">every 15 minutes, automatically</text>
-      <text x="455" y="340" font-weight="600">Room camera</text>
-      <text x="455" y="380">breathing rate per seat, contactless</text>
+    <g font-size="24" fill="#000">
+      <text x="40" y="80" font-weight="600">Patient's phone</text>
+      <text x="40" y="125">scan a QR, no app</text>
+      <text x="40" y="160">20 s finger on camera</text>
+      <text x="40" y="195">press 4 s, relax 6 s</text>
+      <text x="450" y="80" font-weight="600">Laptop</text>
+      <text x="450" y="125">pulse waveform to</text>
+      <text x="450" y="160">heart rate, breathing,</text>
+      <text x="450" y="195">HRV, perfusion, refill</text>
+      <text x="450" y="230">score and trend</text>
+      <text x="860" y="80" font-weight="600">Nurse board</text>
+      <text x="860" y="125">everyone, ranked</text>
+      <text x="860" y="160">with reasons</text>
+      <text x="860" y="195">re-check, find, seen</text>
+      <text x="860" y="230">every 15 minutes</text>
+      <text x="450" y="343" font-weight="600">Room camera</text>
+      <text x="450" y="376">breathing per seat</text>
     </g>
   </svg>
 </section>
 
 <section class="slide">
-  <h1>What it measures — and what it doesn't</h1>
-  <p>Heart rate · breathing rate · heart-rate variability · perfusion · capillary refill time · room breathing.</p>
-  <p>Physics, not AI: blood absorbs light; the camera sees your finger pulse 120 times a second — the same signal as the clip in a hospital.</p>
-  <p>Not oxygen saturation. Not a blood-pressure number. Not a diagnosis.</p>
-  <p><b>It doesn't prevent deterioration. It shortens how long it goes unnoticed.</b></p>
-</section>
-
-<section class="slide">
   <h1>Scan. 30 seconds. You're on the board.</h1>
-  <p>Next: a two-phone transit-time station (the signal behind cuffless blood pressure) · a deterioration model trained on 40,000 ICU trajectories (PhysioNet 2019) · a pilot with one waiting room and one nurse.</p>
-  <p class="src">Built first: HawkEye, two-phone 3D ball tracking. Calibration worked to 0.3 px; the setup didn't earn its demo. Same stack, pointed at something that matters.</p>
+  <p>Next: a two-phone transit-time station, the signal behind cuffless blood pressure. Then a pilot with one waiting room and one nurse.</p>
+  <p class="src">Built first: HawkEye, two-phone 3D ball tracking. Calibration worked. We kept the stack and pointed it at this.</p>
 </section>
 
-<div class="hint">→ / ← · F fullscreen · ⌘P to PDF</div>
+<div class="hint">arrow keys, F for fullscreen, cmd-P for PDF</div>
 <script>
   const slides = [...document.querySelectorAll('.slide')]; let i = 0;
   const go = n => { slides[i].classList.remove('active'); i = (n + slides.length) % slides.length; slides[i].classList.add('active'); };

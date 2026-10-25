@@ -1,20 +1,20 @@
-# Vigil — slides (6) — paste into Google Slides / Keynote
+# Vigil , slides (6) , paste into Google Slides / Keynote
 
 ## 1 · Title
-**Vigil — the waiting room gets a monitor**
+**Vigil , the waiting room gets a monitor**
 Social Hack 2026 · Connect & Intersect · Rushendra + [teammate]
 *Sub: every phone in the waiting room becomes the monitor that notices.*
 
 ## 2 · The gap nobody staffs
 - Triage is a **snapshot**: 2 minutes at arrival → "stable, wait."
 - Then you sit for hours. Guidelines: re-check waiting patients every 1–2 h. Under load, it's skipped.
-- People deteriorate silently in waiting rooms — early sepsis, bleeding, evolving heart attacks — and some die there. 2–10% leave without being seen.
+- People deteriorate silently in waiting rooms , early sepsis, bleeding, evolving heart attacks , and some die there. 2–10% leave without being seen.
 - **We don't prevent deterioration. We shorten how long it goes unnoticed.**
 
 ## 3 · What a phone can measure (physics, not AI)
 - Fingertip on the camera, flash on → blood absorbs light → pulse-oximeter-grade waveform at 120 fps.
   → **heart rate, breathing rate** (respiratory modulation of the pulse), **HRV**, **perfusion**.
-- Press, then relax → **capillary refill time** — the sepsis/shock sign nurses check by pressing a nail — measured in ms.
+- Press, then relax → **capillary refill time** , the sepsis/shock sign nurses check by pressing a nail , measured in ms.
 - A room camera → chest motion → **breathing rate for everyone in view**, continuously, contactless.
 - *(Show: the real waveform; HR 72 vs. a counted pulse; refill curve.)*
 
