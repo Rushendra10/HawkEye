@@ -20,3 +20,4 @@ server/data/calibration_latest.json
 # live sessions and logs stay local; server/data/samples/ is committed
 server/data/2*/
 server/data/*.log
+server/data/pptx_build/
