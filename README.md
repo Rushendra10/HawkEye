@@ -19,7 +19,8 @@ deterioration sooner, it doesn't prevent it; a reassessment aid, not a diagnosti
 cd server
 python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 uvicorn app:app --host 0.0.0.0 --port 8443 --ssl-certfile certs/cert.pem --ssl-keyfile certs/key.pem
-# nurse board: https://<mac-ip>:8443/      patients: scan the QR on the board
+python redirect.py   # port 80: typing just the Mac's IP in any browser lands on the check-in page
+# nurse board: https://<mac-ip>:8443/      patients: scan the QR on the board, or type the Mac's IP
 # room camera: https://<mac-ip>:8443/static/room.html on a phone on a stand (or the Mac webcam)
 ```
 

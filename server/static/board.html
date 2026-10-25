@@ -80,7 +80,7 @@
 (() => {
   const $ = id => document.getElementById(id);
   const host = location.hostname === 'localhost' ? '172.20.10.2' : location.hostname;
-  $('url').textContent = host + ':8443/static/patient.html';
+  $('url').textContent = 'or type ' + host + ' in the browser';
   $('qr').src = '/qr.png?host=' + encodeURIComponent(location.hostname);
   $('reset').onclick = () => { if (confirm('Remove every patient from the board?')) fetch('/reset', { method: 'POST' }).then(refresh); };
   const ago = s => s < 45 ? 'just now' : s < 90 ? '1 min ago' : `${Math.round(s / 60)} min ago`;

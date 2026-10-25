@@ -72,7 +72,7 @@ def go(request: Request):
 <div><p style="font-size:22px;font-weight:600;margin:0 0 8px">Vigil needs Safari for the camera.</p>
 <p style="color:#6b7380;margin:0 0 28px">One tap, no install.</p>
 <a href="x-safari-{target}" style="display:inline-block;background:#15181c;color:#fff;text-decoration:none;font-weight:600;padding:16px 28px;border-radius:10px">Open in Safari</a>
-<p style="color:#6b7380;font-size:14px;margin-top:28px">or type in Safari:<br>{host}/static/patient.html</p></div></body>""")
+<p style="color:#6b7380;font-size:14px;margin-top:28px">or type in Safari:<br>https://{host}/static/patient.html</p></div></body>""")
     return RedirectResponse(target, status_code=302)
 
 
