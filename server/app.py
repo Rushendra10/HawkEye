@@ -89,16 +89,28 @@ class Join(BaseModel):
     age: Optional[int] = None
     complaint: str = ""
     pain: Optional[int] = None
+    seat: Optional[str] = None         # chair number from the check-in form
+
+
+def _norm_seat(s: Optional[str]) -> Optional[str]:
+    if not s or not str(s).strip():
+        return None
+    n = "".join(ch for ch in str(s) if ch.isdigit())
+    return f"seat {int(n)}" if n else str(s).strip()[:16]
 
 
 @app.post("/join")
 def join(j: Join):
     pid = secrets.token_hex(3)
+    seat = _norm_seat(j.seat)
+    for q in PATIENTS.values():                     # one patient per chair
+        if seat and q.get("seat") == seat:
+            q["seat"] = None
     PATIENTS[pid] = {"id": pid, "name": j.name[:24], "age": j.age, "complaint": j.complaint[:200], "pain": j.pain,
                      "flags": vitals.complaint_flags(j.complaint), "joined": time.time(), "checks": [],
-                     "recheck_requested": False, "glow": None, "seat": None}
+                     "recheck_requested": False, "glow": None, "seat": seat}
     log("join", {"id": pid, **j.dict()})
-    return {"id": pid, "flags": PATIENTS[pid]["flags"]}
+    return {"id": pid, "flags": PATIENTS[pid]["flags"], "seat": seat}
 
 
 class Seat(BaseModel):
@@ -112,10 +124,7 @@ def set_seat(pid: str, s: Seat):
     p = PATIENTS.get(pid)
     if not p:
         return JSONResponse({"ok": False}, status_code=404)
-    seat = None
-    if s.seat and s.seat.strip():
-        n = "".join(ch for ch in s.seat if ch.isdigit())
-        seat = f"seat {int(n)}" if n else s.seat.strip()[:16]
+    seat = _norm_seat(s.seat)
     for q in PATIENTS.values():                     # one patient per chair
         if seat and q.get("seat") == seat and q["id"] != pid:
             q["seat"] = None

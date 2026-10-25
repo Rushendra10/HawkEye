@@ -38,9 +38,9 @@
   let stream = null, seats = [], fps = 0, fpsN = 0, fpsT = performance.now();
   const st = m => { $('s').textContent = m; };
 
-  function mkSeat(cx, cy) {
+  function mkSeat(cx, cy, label) {
     const c = document.createElement('canvas'); c.width = RW; c.height = RH;
-    return { label: 'seat ' + (seats.length + 1), cx, cy, ctx: c.getContext('2d', { willReadFrequently: true }), hist: [], disp: 0, sig: [], times: [], rr: null, snr: 0, amp: 0, apnea: 0 };
+    return { label, cx, cy, ctx: c.getContext('2d', { willReadFrequently: true }), hist: [], disp: 0, sig: [], times: [], rr: null, snr: 0, amp: 0, apnea: 0 };
   }
   async function start(front) {
     if (stream) stream.getTracks().forEach(t => t.stop());
@@ -56,9 +56,15 @@
     const s = Math.min(r.width / vw, r.height / vh), dw = vw * s, dh = vh * s, ox = r.left + (r.width - dw) / 2, oy = r.top + (r.height - dh) / 2;
     const x = (e.clientX - ox) / dw, y = (e.clientY - oy) / dh; if (x < 0 || x > 1 || y < 0 || y > 1) return;
     const hit = seats.findIndex(q => Math.abs(q.cx - x) < BW / 2 && Math.abs(q.cy - y) < BH / 2);
-    if (hit >= 0) { seats.splice(hit, 1); seats.forEach((q, i) => q.label = 'seat ' + (i + 1)); return; }
+    if (hit >= 0) { seats.splice(hit, 1); return; }
     if (seats.length >= MAX) return;
-    seats.push(mkSeat(Math.min(1 - BW / 2, Math.max(BW / 2, x)), Math.min(1 - BH / 2, Math.max(BH / 2, y))));
+    // the chair number written on the chair: the same number the patient types at check-in
+    const used = seats.map(q => +q.label.replace(/\D/g, '')).filter(n => n > 0);
+    const guess = used.length ? Math.max(...used) + 1 : 1;
+    const n = prompt('Chair number on this chair?', guess); if (n === null) return;
+    const num = parseInt(n, 10); if (!num) return;
+    seats = seats.filter(q => q.label !== 'seat ' + num);
+    seats.push(mkSeat(Math.min(1 - BW / 2, Math.max(BW / 2, x)), Math.min(1 - BH / 2, Math.max(BH / 2, y)), 'seat ' + num));
   });
 
   function profiles(seat) {

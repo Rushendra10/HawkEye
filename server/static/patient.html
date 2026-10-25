@@ -40,6 +40,7 @@
   <p>You're in the waiting room. Your phone will keep an eye on you while you wait, and the nurse will see if anything changes. Takes 30 seconds, every 15 minutes.</p>
   <label>Your name or initials</label><input id="name" autocomplete="off">
   <label>Age</label><input id="age" type="number" inputmode="numeric">
+  <label>Chair number (on the chair)</label><input id="chair" type="number" inputmode="numeric" autocomplete="off">
   <label>What brings you in today?</label><textarea id="complaint" placeholder="e.g. chest pain since this morning, short of breath"></textarea>
   <label>Pain right now (0–10)</label><div class="range"><input id="pain" type="range" min="0" max="10" value="3"><span id="painv">3</span></div>
   <button id="join">Start</button>
@@ -92,10 +93,12 @@
 
   // ---------- join
   $('join').onclick = async () => {
-    const body = { name: $('name').value.trim() || 'anon', age: +$('age').value || null, complaint: $('complaint').value.trim(), pain: +$('pain').value };
+    const body = { name: $('name').value.trim() || 'anon', age: +$('age').value || null, complaint: $('complaint').value.trim(), pain: +$('pain').value, seat: $('chair').value.trim() || null };
     if (!body.name) return;
     const r = await fetch(base + '/join', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    const j = await r.json(); pid = j.id; localStorage.setItem('pid', pid); show('s-measure');
+    const j = await r.json(); pid = j.id; localStorage.setItem('pid', pid);
+    if (j.seat) { $('seat').value = j.seat.replace(/\D/g, ''); $('seat-msg').textContent = `${j.seat}: the room camera watches your breathing there.`; }
+    show('s-measure');
   };
 
   // ---------- camera + PPG capture
