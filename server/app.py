@@ -52,11 +52,28 @@ def qr_png(request: Request):
     host = request.headers.get("host", "172.20.10.2:8443").split(":")[0]
     if host in ("localhost", "127.0.0.1"):            # board opened on the Mac itself: phones need the hotspot IP
         host = os.environ.get("VIGIL_HOST", "172.20.10.2")
-    url = f"https://{host}:8443/static/patient.html"
+    url = f"https://{host}:8443/go"
     img = qrcode.make(url, box_size=6, border=1)
     buf = io.BytesIO(); img.save(buf, format="PNG")
     from fastapi.responses import Response
     return Response(content=buf.getvalue(), media_type="image/png", headers={"X-Url": url})
+
+
+@app.get("/go")
+def go(request: Request):
+    """QR landing. Chrome on iPhone cannot run the camera page, so hand it to Safari; everyone else goes straight in."""
+    from fastapi.responses import HTMLResponse, RedirectResponse
+    host = request.headers.get("host", "172.20.10.2:8443")
+    target = f"https://{host}/static/patient.html"
+    ua = request.headers.get("user-agent", "")
+    if "CriOS" in ua or ("iPhone" in ua and "Safari" not in ua):
+        return HTMLResponse(f"""<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigil</title><body style="margin:0;background:#fff;color:#15181c;font:18px -apple-system,system-ui;display:flex;min-height:100vh;align-items:center;justify-content:center;text-align:center;padding:24px">
+<div><p style="font-size:22px;font-weight:600;margin:0 0 8px">Vigil needs Safari for the camera.</p>
+<p style="color:#6b7380;margin:0 0 28px">One tap, no install.</p>
+<a href="x-safari-{target}" style="display:inline-block;background:#15181c;color:#fff;text-decoration:none;font-weight:600;padding:16px 28px;border-radius:10px">Open in Safari</a>
+<p style="color:#6b7380;font-size:14px;margin-top:28px">or type in Safari:<br>{host}/static/patient.html</p></div></body>""")
+    return RedirectResponse(target, status_code=302)
 
 
 class Join(BaseModel):
