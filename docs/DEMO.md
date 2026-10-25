@@ -6,8 +6,9 @@
 2. Mac: `cd server && source .venv/bin/activate && uvicorn app:app --host 0.0.0.0 --port 8443 --ssl-certfile certs/cert.pem --ssl-keyfile certs/key.pem` and, in a second terminal, `python redirect.py` (port 80, so typing `172.20.10.2` works). A typed address must otherwise start with `https://`, or Safari says "connection lost".
 3. Projector: `https://localhost:8443/` (accept the cert warning once, or `mkcert -install`). Press **Reset**.
 4. Room camera: teammate's phone on a stand facing the audience, `https://172.20.10.2:8443/static/room.html`, Start (rear), tap 3–4 chests. (Or the Mac webcam at `https://localhost:8443/static/room.html`.)
-5. Pre-seed the board: teammate checks in on her phone 10 min before (so she has a baseline to "deteriorate" from). Two friends check in too, so the board isn't empty.
-6. Backup video of a full run on the Mac desktop.
+5. Phones must trust the local certificate. On any phone, open `http://172.20.10.2/ca` in Safari → Allow → Settings → Profile Downloaded → Install → then Settings → General → About → Certificate Trust Settings → turn on full trust for the mkcert root. Both team phones are done; a judge's phone would need this too, so the judge does the finger test on one of ours.
+6. Pre-seed the board: teammate checks in on her phone 10 min before (so she has a baseline to "deteriorate" from). Two friends check in too, so the board isn't empty.
+7. Backup video of a full run on the Mac desktop.
 
 ## Script (5 min)
 
