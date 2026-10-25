@@ -30,6 +30,10 @@
 </head>
 <body>
 <div id="glow"></div>
+<div id="seatbox" style="display:none; padding: 12px 20px 0;">
+  <div class="seatrow"><label for="seat">Chair number</label><input id="seat" inputmode="numeric" pattern="[0-9]*" placeholder="on the chair"><button id="seat-save" class="alt">Save</button></div>
+  <div class="sub" id="seat-msg">The room camera watches breathing at your chair.</div>
+</div>
 
 <section id="s-join" class="screen active">
   <h1>Vigil</h1>
@@ -54,8 +58,6 @@
 <section id="s-result" class="screen">
   <h1>Recorded</h1>
   <p id="r-msg">The nurse can see this. We'll ask you to check again in 15 minutes — keep this page open.</p>
-  <div class="seatrow"><label for="seat">Chair number</label><input id="seat" inputmode="numeric" pattern="[0-9]*" placeholder="on the chair"><button id="seat-save" class="alt">Save</button></div>
-  <div class="sub" id="seat-msg">Between checks the room camera watches breathing at your chair.</div>
   <div class="grid">
     <div class="card"><div class="v" id="r-hr">—</div><div class="k">heart rate, bpm</div></div>
     <div class="card"><div class="v" id="r-rr">—</div><div class="k">breaths / min</div></div>
@@ -78,7 +80,7 @@
 (() => {
   const $ = id => document.getElementById(id);
   const base = location.origin;
-  const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); $(id).classList.add('active'); };
+  const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); $(id).classList.add('active'); $('seatbox').style.display = id === 's-join' ? 'none' : 'block'; };
   let pid = localStorage.getItem('pid');
   $('seat-save').onclick = async () => {
     if (!pid) return; const v = $('seat').value.trim();
