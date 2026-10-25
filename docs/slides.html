@@ -95,6 +95,7 @@
 <script>
   const slides = [...document.querySelectorAll('.slide')]; let i = 0;
   const go = n => { slides[i].classList.remove('active'); i = (n + slides.length) % slides.length; slides[i].classList.add('active'); };
+  if (/^#\d+$/.test(location.hash)) go(parseInt(location.hash.slice(1), 10) - 1);
   document.addEventListener('keydown', e => {
     if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) go(i + 1);
     else if (['ArrowLeft', 'PageUp'].includes(e.key)) go(i - 1);

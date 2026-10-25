@@ -47,10 +47,6 @@ diagnostic; no SpO2, no BP number.
 2. **Slides (6)** , `docs/DEMO.md` has the structure; rewrite for Vigil: the waiting-room problem, what we
    measure and how (finger PPG physics, capillary refill, room breathing), the board and score, the honest
    limits, what we built first (HawkEye) and why we switched, what's next (two-phone transit time station,
-   PhysioNet-trained deterioration model , both designed, not built).
-3. If time: **deterioration model** on PhysioNet 2019 Sepsis Challenge data (public). Gradient boosting on
-   HR/RR trajectories → risk; report held-out AUROC on a slide. Not wired into the board unless it is done
-   and honest.
 
 ## Tasks , Rushendra (tonight)
 
