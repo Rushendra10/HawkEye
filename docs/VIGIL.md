@@ -32,6 +32,9 @@ aid, not a diagnostic; no SpO2, no BP number.
   room-breathing panel.
 - `static/room.html`: room camera. Tap up to 6 chests; per-seat breathing rate from chest motion, apnea flag,
   `POST /room` every 2 s. Runs on the Mac webcam (`https://localhost:8443/static/room.html`) or a phone on a stand.
+  Seats are linked to patients by chair number: the patient types it on the result screen (`POST /seat/{id}`) or
+  the nurse picks a name under the seat on the board. A linked seat's live breathing shows in the patient's row
+  and feeds the score (camera apnea +3, camera breathing over 20/min by NEWS bands).
 - `docs/slides.html`: the deck, 5 slides. Arrow keys, F fullscreen, cmd-P for PDF.
 - `test_e2e.py`: end-to-end with real finger frames; creates three patients, exercises re-check, glow, room, board.
   Run `POST /reset` after it so the board is empty.

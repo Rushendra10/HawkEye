@@ -274,6 +274,14 @@ def score_patient(p: Dict, now: float) -> Dict:
             score += 2; reasons.append(f"capillary refill {last['crt_s']} s (+2)")
         if last.get("pi") is not None and last["pi"] < 0.3:
             score += 1; reasons.append("weak perfusion (+1)")
+    live = p.get("live")                       # room camera, this patient's chair, right now
+    if live:
+        if live.get("apnea"):
+            score += 3; reasons.append("camera: no breathing movement (+3)")
+        elif live.get("rr") is not None and live["rr"] > 20:
+            rl = news_points_rr(live["rr"]); rc = news_points_rr(last.get("rr")) if last else 0
+            if rl > rc:
+                score += rl - rc; reasons.append(f"camera: breathing {round(live['rr'])}/min (+{rl - rc})")
     flags = p.get("flags", [])
     severe = {"chest pain", "breathing", "stroke", "bleeding", "syncope", "seizure", "anaphylaxis", "overdose", "infant", "confusion"}
     for f in flags:

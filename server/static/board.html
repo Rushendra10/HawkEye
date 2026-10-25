@@ -45,7 +45,8 @@
   td.act { white-space: nowrap; text-align: right; } td.act button { margin-left: 6px; }
   aside h3 { margin: 0; padding: 12px 14px; font-size: 13px; color: #6b7380; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #eceef1; }
   aside .panel { margin-bottom: 16px; } aside .body { padding: 12px 14px; }
-  .seat { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid #eceef1; } .seat:last-child { border-bottom: 0; }
+  .seat { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #eceef1; } .seat:last-child { border-bottom: 0; }
+  .seat select { font: inherit; font-size: 13px; color: #6b7380; border: 1px solid #e1e4e8; border-radius: 4px; background: #fff; padding: 2px 4px; margin-top: 2px; max-width: 150px; }
   .legend { color: #6b7380; font-size: 13px; line-height: 1.55; }
   #empty { color: #6b7380; padding: 48px 20px; text-align: center; }
   @media (max-width: 1560px) { main { grid-template-columns: 1fr; } aside { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } aside .panel { margin: 0; } }
@@ -107,7 +108,7 @@
       html += `<tr class="p ${cls}" data-id="${p.id}"><td><div class="score ${scls}">${p.score}</div></td>
         <td class="pt"><div class="name">${esc(p.name)}${p.age ? ', ' + p.age : ''}</div><div class="sub">${esc(p.complaint)}${p.pain != null ? (p.complaint ? ' · ' : '') + 'pain ' + p.pain + '/10' : ''}</div><div>${(p.flags || []).map(f => '<span class="flag">' + esc(f) + '</span>').join('')}</div></td>
         <td><span class="v ${L.hr > 110 || L.hr < 50 ? 'bad' : L.hr > 90 ? 'warn' : ''}">${L.hr ?? '–'}</span> <span class="k">bpm</span></td>
-        <td><span class="v ${L.rr > 24 || L.rr < 9 ? 'bad' : L.rr > 20 ? 'warn' : ''}">${L.rr ?? '–'}</span> <span class="k">/min</span></td>
+        <td><span class="v ${L.rr > 24 || L.rr < 9 ? 'bad' : L.rr > 20 ? 'warn' : ''}">${L.rr ?? '–'}</span> <span class="k">/min</span>${p.live ? `<div class="sub ${p.live.apnea || p.live.rr > 24 ? 'bad' : ''}">camera ${p.live.apnea ? 'no breathing' : (p.live.rr != null ? Math.round(p.live.rr) + '/min' : 'reading')}</div>` : (p.seat ? `<div class="sub">${esc(p.seat)}, camera off</div>` : '')}</td>
         <td><span class="v">${L.rmssd_ms ?? '–'}</span> <span class="k">ms</span></td>
         <td><span class="v ${L.crt_s > 2 ? 'bad' : ''}">${L.crt_s ?? '–'}</span> <span class="k">s</span></td>
         <td><span class="v ${p.risk >= 90 ? 'bad' : p.risk >= 75 ? 'warn' : ''}">${p.risk ?? '–'}</span> <span class="k">pct</span></td>
@@ -123,9 +124,15 @@
         tr.querySelectorAll('button').forEach(b => b.onclick = () => fetch(`/${b.dataset.a}/${p.id}`, { method: 'POST' }).then(() => { lastHTML = ''; refresh(); })); });
     }
     const seats = Object.entries(j.room || {}).filter(([k, s]) => now - (s.t || 0) < 10);
+    if ($('room').contains(document.activeElement)) return;            // nurse is choosing a name: don't redraw under her
+    const who = k => (j.patients.find(p => p.seat === k) || {}).id || '';
     $('room').innerHTML = seats.length
-      ? seats.map(([k, s]) => `<div class="seat"><span>${esc(k)}</span><span class="v ${s.apnea || s.rr > 24 ? 'bad' : s.rr > 20 ? 'warn' : ''}">${s.apnea ? 'APNEA' : (s.rr != null ? Math.round(s.rr) : '–')}${s.apnea ? '' : ' <span class="k">/min</span>'}</span></div>`).join('')
+      ? seats.map(([k, s]) => `<div class="seat"><span>${esc(k)}<br><select data-seat="${esc(k)}"><option value="">nobody</option>${j.patients.map(p => `<option value="${p.id}" ${p.seat === k ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></span><span class="v ${s.apnea || s.rr > 24 ? 'bad' : s.rr > 20 ? 'warn' : ''}">${s.apnea ? 'APNEA' : (s.rr != null ? Math.round(s.rr) : '–')}${s.apnea ? '' : ' <span class="k">/min</span>'}</span></div>`).join('')
       : '<span class="sub">no camera running</span>';
+    $('room').querySelectorAll('select').forEach(sel => sel.onchange = () => {
+      const k = sel.dataset.seat, pid = sel.value || who(k);
+      if (pid) fetch(`/seat/${pid}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ seat: sel.value ? k : null }) }).then(() => { lastHTML = ''; sel.blur(); refresh(); });
+    });
   }
   refresh(); setInterval(refresh, 2000);
 })();

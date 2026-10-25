@@ -88,9 +88,40 @@ def join(j: Join):
     pid = secrets.token_hex(3)
     PATIENTS[pid] = {"id": pid, "name": j.name[:24], "age": j.age, "complaint": j.complaint[:200], "pain": j.pain,
                      "flags": vitals.complaint_flags(j.complaint), "joined": time.time(), "checks": [],
-                     "recheck_requested": False, "glow": None}
+                     "recheck_requested": False, "glow": None, "seat": None}
     log("join", {"id": pid, **j.dict()})
     return {"id": pid, "flags": PATIENTS[pid]["flags"]}
+
+
+class Seat(BaseModel):
+    seat: Optional[str] = None         # "3" or "seat 3"; null clears
+
+
+@app.post("/seat/{pid}")
+def set_seat(pid: str, s: Seat):
+    """Link a patient to a numbered chair so the room camera's per-seat breathing is theirs.
+    Set by the patient (chair number on the phone) or by the nurse on the board."""
+    p = PATIENTS.get(pid)
+    if not p:
+        return JSONResponse({"ok": False}, status_code=404)
+    seat = None
+    if s.seat and s.seat.strip():
+        n = "".join(ch for ch in s.seat if ch.isdigit())
+        seat = f"seat {int(n)}" if n else s.seat.strip()[:16]
+    for q in PATIENTS.values():                     # one patient per chair
+        if seat and q.get("seat") == seat and q["id"] != pid:
+            q["seat"] = None
+    p["seat"] = seat
+    log("seat", {"id": pid, "seat": seat})
+    return {"ok": True, "seat": seat}
+
+
+def _live(p: Dict[str, Any], now: float) -> Optional[Dict[str, Any]]:
+    """The room camera's current reading for this patient's chair, if fresh."""
+    s = ROOM.get(p.get("seat") or "")
+    if not s or now - (s.get("t") or 0) > 10:
+        return None
+    return {"rr": s.get("rr"), "apnea": bool(s.get("apnea")), "snr": s.get("snr"), "t": s.get("t")}
 
 
 class Measure(BaseModel):
@@ -125,8 +156,11 @@ def me(pid: str):
     if not p:
         return JSONResponse({"ok": False}, status_code=404)
     last = p["checks"][-1] if p["checks"] else None
+    now = time.time()
+    live = _live(p, now)
     return {"ok": True, "name": p["name"], "recheck_requested": p["recheck_requested"], "glow": p["glow"],
-            "last_check_t": last["t"] if last else None, "last": last, "score": vitals.score_patient(p, time.time())}
+            "seat": p.get("seat"), "live": live,
+            "last_check_t": last["t"] if last else None, "last": last, "score": vitals.score_patient({**p, "live": live}, now)}
 
 
 @app.post("/recheck/{pid}")
@@ -165,15 +199,18 @@ def patients():
     now = time.time()
     out = []
     for p in PATIENTS.values():
-        sc = vitals.score_patient(p, now)
+        live = _live(p, now)
+        sc = vitals.score_patient({**p, "live": live}, now)
         ok_checks = [c for c in p["checks"] if c.get("ok")]
         last = p["checks"][-1] if p["checks"] else None
         out.append({"id": p["id"], "name": p["name"], "age": p["age"], "complaint": p["complaint"], "pain": p["pain"], "flags": p["flags"],
+                    "seat": p.get("seat"), "live": live,
                     "joined": p["joined"], "last": last, "n_checks": len(p["checks"]), "recheck_requested": p["recheck_requested"],
                     "glow": p["glow"], "hr_series": [[c["t"], c.get("hr")] for c in ok_checks], "rr_series": [[c["t"], c.get("rr")] for c in ok_checks],
                     **sc, **vitals.risk(p, ok_checks)})
     out.sort(key=lambda x: (-x["score"], -(now - (x["last"]["t"] if x["last"] else x["joined"]))))
-    return {"server_time": now, "patients": out, "room": ROOM}
+    room = {k: {**s, "patient": next((q["name"] for q in PATIENTS.values() if q.get("seat") == k), None)} for k, s in ROOM.items()}
+    return {"server_time": now, "patients": out, "room": room}
 
 
 @app.post("/reset")
