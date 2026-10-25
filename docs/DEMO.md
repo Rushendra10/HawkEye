@@ -1,70 +1,35 @@
-# Demo — setup checklist, scripts, judge Q&A
+# Demo — Vigil
 
-## Setup checklist (12 minutes, same order every time)
+## Setup (10 min, in this order)
 
-1. Hotspot on. Mac + both phones joined. Mac IP matches the cert (else `mkcert` again, 10 s).
-2. Mac: `uvicorn app:app --host 0.0.0.0 --port 8443 --ssl-certfile certs/cert.pem --ssl-keyfile certs/key.pem`.
-   Projector: `https://<mac>:8443/`. Reset.
-3. Place the phones: landscape, resting on bottles, ~3 m apart, each angled ~30° toward the
-   center of the throwing volume, lens height 0.6–1.2 m, plugged in. Both see the whole arc and
-   the wall (Demo B). Do not touch them again.
-4. Both phones: Safari → `https://<mac>:8443/static/capture.html`. Camera visible.
-   (Intrinsics were done Saturday; skip unless the stream resolution changed — check the status line.)
-5. Board: `board.html` fullscreen on the Mac, lid vertical, placed ~2 m from each phone, facing
-   both. Tap **Lock** on both. Dashboard shows both cameras and the baseline. Sanity: baseline ≈ tape.
-6. Remove the Mac. Both phones → **Live**. Dashboard: both cameras alive.
-7. Hold the ball at the crosshair → **Sample ball** on both (lighting may have changed).
-8. Drop test. `g` on screen. Not within 9.8 ± 0.5 → re-lock (step 5) before demoing.
-9. Second ball in your pocket.
+1. Hotspot on (Rushendra's phone). Mac + teammate's phone joined. Mac IP = `172.20.10.2` (check `ipconfig getifaddr en0`; if different, `mkcert` a new cert — 10 s — and set `VIGIL_HOST`).
+2. Mac: `cd server && source .venv/bin/activate && uvicorn app:app --host 0.0.0.0 --port 8443 --ssl-certfile certs/cert.pem --ssl-keyfile certs/key.pem`
+3. Projector: `https://localhost:8443/` (accept the cert warning once, or `mkcert -install`). Press **Reset**.
+4. Room camera: teammate's phone on a stand facing the audience, `https://172.20.10.2:8443/static/room.html`, Start (rear), tap 3–4 chests. (Or the Mac webcam at `https://localhost:8443/static/room.html`.)
+5. Pre-seed the board: teammate checks in on her phone 10 min before (so she has a baseline to "deteriorate" from). Two friends check in too, so the board isn't empty.
+6. Backup video of a full run on the Mac desktop.
 
-## Demo A — arc throw (90 s)
+## Script (5 min)
 
-- "Two phones, placed a minute ago, no rig. They looked at the laptop once."
-- Drop the ball from shoulder height → point at the screen: **g = 9.8**. "That's the phones
-  measuring gravity. Everything you see next is the same math."
-- Underhand lob. Screen: 3D arc, release speed, launch angle, apex height.
-- Second lob, harder. Numbers move accordingly.
+- **0:00** "Triage is a snapshot. Waiting is where people get worse unseen. We don't prevent it — we notice it sooner." Slide 2.
+- **0:40** Slide 3, 30 s: the physics. Then: "Let's do it on you." Judge scans the QR, types *chest pain*, finger on camera, flash on. 30 s + 12 s. Their row appears: HR, breathing, HRV, refill, score 2 with "complaint: chest pain" in the reasons. *"That waveform is the same signal as the clip on your finger in a hospital."*
+- **2:10** Board walk-through: ranking, reasons, trend lines. Teammate: "I checked in 10 minutes ago — resting." She does 30 squats (or runs the stairs beforehand), re-checks on stage: her row jumps to the top, red, *"HR up 38% since arrival (+1), RR 24 (+2)."* Nurse taps **Find** → her phone glows orange in the audience.
+- **3:30** Room camera: breathing rates over the audience's chests. "Hold your breath" → APNEA on one seat in ~8 s.
+- **4:15** Slide 5: honest limits, HawkEye first. Slide 6: what's next. Done.
 
-## Demo B — wall bounce (90 s)
+## If something breaks
 
-- Throw at the wall, catch the return.
-- Screen: two arcs split at the impact; speed in → out; impact point on the wall; restitution;
-  **g fitted on both legs independently**.
-- "Hawk-Eye's job is the bounce point. That's it, from two phones."
-
-## Slides (6)
-
-1. Title + one-line claim.
-2. Pros have Hawk-Eye / TrackMan. Amateurs on a court have single-phone apps that need painted
-   lines. On a lawn: nothing. (2×2: known geometry vs anywhere × one camera vs multi-view.)
-3. Why one camera can't (depth), why two can (rays intersect), what "look at the laptop once" does
-   (intrinsics + extrinsics, one shared frame).
-4. Pipeline: phones (browser) → detections → Mac → rays → intersect → segments → fits → physics.
-5. Accuracy: `g = 9.79 ± 0.15 (n=10)`, residual ~2 cm; chart: error vs number of phones / angle.
-6. Next: N phones in the crowd (same math, each phone adds rays); same engine on a sidewalk for
-   car speeds.
+- Finger reading "unreadable": press the finger flatter, keep still, re-check. Don't debug; move on to the next beat.
+- Board doesn't update: refresh the tab. Server log: `server/data/uvicorn.log`.
+- Room camera finds nothing: the chest box must be on a textured shirt, person still; skip to slide 5 if it fights you.
+- Total failure: play the backup video, narrate.
 
 ## Judge Q&A
 
-- **Why two phones?** One camera has no depth. Single-phone apps cheat with known geometry (court
-  lines, hoop size). Two views make depth a geometry problem. We need no field markings.
-- **Why not a radar gun?** Speed only, only head-on, no trajectory, no bounce, no arc.
-- **Does this exist?** For bodies: Uplift Capture (two iPhones on tripods, calibration target,
-  cloud). For balls: single-phone apps needing court lines; a 2018 Stanford class project with two
-  iPhones got 0.5 m error and needed court landmarks; Maiden AI holds patents, ships single-phone.
-  Nobody ships two phones, anywhere, live, in a browser.
-- **Why a web page and not an app?** Because it works on any phone in the room in ten seconds —
-  that is the whole point of "every spectator's phone can join". (Also true: no App Store needed.)
-- **Accuracy?** Depth resolution a few cm at 10 m with a 3 m baseline; speed ~2–3% after sync.
-  Degrades with distance² and short baselines.
-- **Spin?** Not in v1.
-- **Sync?** HTTP min-RTT ping, then refined by minimizing triangulation residual over ±80 ms.
-- **What if the ball leaves one camera's view?** Not triangulated for that span; with 3+ phones it
-  would be — the N-phone point.
-- **Why a checkerboard and not ARKit?** Works on every phone, including ones a judge is holding.
-  Deterministic, one photo per phone.
-
-## If the live demo fails
-
-Play Sunday morning's backup video, say "here is this morning's run", keep going.
-Do not debug on stage.
+- **Why not a smartwatch?** Most patients don't wear one; this works on any phone, no app, no account, in ten seconds.
+- **Accuracy?** Heart rate from contact PPG at 120 fps is pulse-oximeter class (we match a counted pulse). Breathing from pulse modulation is ±2–3/min when still. Capillary refill is a 10-ms measurement of something nurses eyeball at 1-s resolution.
+- **Does this exist?** Phone pulse apps exist for one person. Remote monitoring exists with wearables. Nobody runs the waiting room off patients' own phones with trend-based re-triage on a nurse board.
+- **Liability / regulation?** It's a reassessment prompt for a nurse, not a diagnostic. Pilot as decision support; FDA path later.
+- **Privacy?** First name, age, complaint; raw signal never leaves the room's Mac; patient removed on "Seen".
+- **Why the web and not an app?** A scared person in an ER won't install anything. A QR and 10 seconds, they will.
+- **What about people without phones?** The ER keeps a few loaner phones at the desk; the page works on any of them.

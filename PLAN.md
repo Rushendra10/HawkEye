@@ -1,3 +1,5 @@
+> **Superseded Sat 20:30 — the project is now Vigil. Read `docs/VIGIL.md`.** This file is the original HawkEye plan, kept for the record.
+
 # HawkEye — the plan
 
 Two people. One Mac, one Windows laptop, two iPhones, a browser. Two demos. Nothing that does

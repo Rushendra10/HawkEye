@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vigil — waiting room</title>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
   :root { color-scheme: dark; } * { box-sizing: border-box; }
   body { margin: 0; background: #0b0f14; color: #e8eef5; font: 16px -apple-system, system-ui, sans-serif; }
@@ -39,7 +38,7 @@
   <span class="meta" id="meta">—</span>
   <span class="spacer"></span>
   <div><div class="sub">patients: scan to check in</div><div class="sub" id="url"></div></div>
-  <canvas id="qr"></canvas>
+  <img id="qr" src="/qr.png" alt="QR">
   <button onclick="fetch('/reset',{method:'POST'})">Reset</button>
 </header>
 <main>
@@ -58,9 +57,9 @@
 <script>
 (() => {
   const $ = id => document.getElementById(id);
-  const patientURL = location.origin + '/static/patient.html';
+  const patientURL = 'https://' + (location.hostname === 'localhost' ? '172.20.10.2' : location.hostname) + ':8443/static/patient.html';
   $('url').textContent = patientURL.replace('https://', '');
-  QRCode.toCanvas($('qr'), patientURL, { width: 84, margin: 1 });
+  $('qr').src = '/qr.png?host=' + encodeURIComponent(location.hostname);
   const ago = s => s < 60 ? `${Math.round(s)} s` : `${Math.floor(s / 60)} min`;
   function spark(c, series) {
     const W = c.width = 120 * devicePixelRatio, H = c.height = 36 * devicePixelRatio, ctx = c.getContext('2d'); ctx.clearRect(0, 0, W, H);
@@ -90,7 +89,8 @@
       tr.querySelectorAll('button').forEach(b => b.onclick = () => fetch(`/${b.dataset.a}/${p.id}`, { method: 'POST' }).then(refresh));
       rows.appendChild(tr);
     }
-    const seats = Object.entries(j.room || {}); $('room').innerHTML = seats.length ? seats.map(([k, s]) => `<div class="seat"><span>${k}</span><span class="v ${s.rr > 24 ? 'bad' : s.rr > 20 ? 'warn' : ''}">${s.rr != null ? Math.round(s.rr) : '—'} <span class="k">/min</span></span></div>`).join('') : '<span class="sub">no camera running</span>';
+    const seats = Object.entries(j.room || {}).filter(([k, s]) => now - (s.t || 0) < 10);
+    $('room').innerHTML = seats.length ? seats.map(([k, s]) => `<div class="seat"><span>${k}</span><span class="v ${s.apnea || s.rr > 24 ? 'bad' : s.rr > 20 ? 'warn' : ''}">${s.apnea ? 'APNEA' : (s.rr != null ? Math.round(s.rr) : '—')} <span class="k">${s.apnea ? '' : '/min'}</span></span></div>`).join('') : '<span class="sub">no camera running</span>';
   }
   refresh(); setInterval(refresh, 2000);
 })();

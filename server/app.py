@@ -21,6 +21,8 @@ DATA = os.path.join(HERE, "data", time.strftime("%Y%m%d_%H%M%S"))
 os.makedirs(DATA, exist_ok=True)
 
 app = FastAPI(title="Vigil")
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 app.mount("/static", StaticFiles(directory=os.path.join(HERE, "static")), name="static")
 
 PATIENTS: Dict[str, Dict[str, Any]] = {}
@@ -40,6 +42,21 @@ def index():
 @app.get("/time")
 def get_time():
     return {"server_time": time.time()}
+
+
+@app.get("/qr.png")
+def qr_png(request: Request):
+    """QR for the patient page, pointing at whatever host the board was opened on (hotspot IP)."""
+    import io
+    import qrcode
+    host = request.headers.get("host", "172.20.10.2:8443").split(":")[0]
+    if host in ("localhost", "127.0.0.1"):            # board opened on the Mac itself: phones need the hotspot IP
+        host = os.environ.get("VIGIL_HOST", "172.20.10.2")
+    url = f"https://{host}:8443/static/patient.html"
+    img = qrcode.make(url, box_size=6, border=1)
+    buf = io.BytesIO(); img.save(buf, format="PNG")
+    from fastapi.responses import Response
+    return Response(content=buf.getvalue(), media_type="image/png", headers={"X-Url": url})
 
 
 class Join(BaseModel):

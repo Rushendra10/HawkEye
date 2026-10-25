@@ -67,14 +67,16 @@ def analyze_ppg(frames: List[List[float]]) -> Dict:
     hp = s - np.convolve(s, np.ones(max(3, int(fs))) / max(3, int(fs)), mode="same")
     bp = _bandpass(hp, fs, 0.7, 3.0)
     f_hr, snr = _spectral_peak(hp, fs, 0.7, 3.0)
-    pk = _peaks(bp, t, 0.33)
+    # Beat detection guided by the spectral rate: the refractory period (60% of the expected beat interval)
+    # suppresses the dicrotic notch, and only intervals within ±25% of the expected one count as beats.
+    exp_ibi = 1.0 / f_hr if f_hr else 0.8
+    pk = _peaks(bp, t, 0.6 * exp_ibi)
     ibi = np.diff(t[pk]) if len(pk) > 2 else np.array([])
-    ibi = ibi[(ibi > 0.33) & (ibi < 1.5)]
-    if len(ibi) >= 5:                                  # drop missed/double beats before HRV (>30% off the median)
-        med = np.median(ibi)
-        ibi = ibi[np.abs(ibi - med) < 0.3 * med]
+    ibi = ibi[np.abs(ibi - exp_ibi) < 0.25 * exp_ibi]
     hr_pk = 60 / float(np.median(ibi)) if len(ibi) >= 5 else None
-    hr = hr_pk if hr_pk is not None else (f_hr * 60 if f_hr else None)
+    hr = f_hr * 60 if f_hr else None
+    if hr_pk is not None and hr is not None and abs(hr_pk - hr) < 0.1 * hr:
+        hr = hr_pk                                    # beat-based value is finer than the spectral bin when they agree
     rmssd = float(np.sqrt(np.mean(np.diff(ibi) ** 2)) * 1000) if len(ibi) >= 6 else None
     sdnn = float(ibi.std() * 1000) if len(ibi) >= 6 else None
     # perfusion index: AC amplitude / DC (%)

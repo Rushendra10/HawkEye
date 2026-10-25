@@ -1,51 +1,42 @@
-# HawkEye — two iPhones, one 3D ball tracker
+# Vigil — the waiting room gets a monitor
 
-Put two ordinary phones down a few meters apart, pointed at the same space from two angles.
-Throw a ball. A laptop shows the ball's real 3D flight: speed, launch angle, apex, bounce point,
-and — as proof it is real — the measured gravitational acceleration (should read 9.8 m/s²).
+Triage is a snapshot at arrival. Waiting is where people get worse unseen. Vigil turns every phone in
+an ER waiting room into the monitor that notices.
 
-No court lines, no tripods, no app install: the phones run a web page. They look at the laptop
-screen once (a checkerboard) and that puts both cameras in one coordinate frame.
-Built in 24 hours at Social Hack (UMN), theme **Connect & Intersect**: two views connected, rays
-intersecting.
+Scan a QR → a web page (no app) → fingertip on the camera with the flash on for 30 s → a
+pulse-oximeter-grade waveform → **heart rate, breathing rate, HRV, perfusion**, then a 12-second
+press-and-relax **capillary refill** test. The nurse's board ranks everyone in the room with a
+transparent NEWS-style score plus *trend since arrival*, asks for re-checks every 15 minutes, and can
+make a patient's phone glow to find them. A room camera counts everyone's breathing between checks,
+contactless, from chest motion.
 
-## How it works (one paragraph)
+Built in 24 h at Social Hack 2026 (UMN), theme *Connect & Intersect*. Honest claims only: it catches
+deterioration sooner, it doesn't prevent it; a reassessment aid, not a diagnostic; no SpO2, no BP.
 
-Each phone opens `capture.html` in Safari. A chessboard shown on the laptop gives each phone's
-lens parameters (8 photos) and its position and orientation (1 photo, `solvePnP`). From then on
-the phones stay still. Each phone detects the ball in every camera frame by color and streams
-`(time, u, v)` pixel detections to a small Python server on the Mac. The server turns each
-detection into a 3D ray, intersects the two rays frame by frame, splits the track at bounces,
-fits a parabola to each flight segment, and reports the physics. A browser dashboard draws it.
-
-## Repo layout
-
-```
-PLAN.md             roles, fail-fast order, timeline, gates, kill-switches   <- read this first
-docs/API.md         the contract between the capture page and the server
-docs/MATH.md        calibration + solver, step by step, with validation tests
-docs/WEB.md         the capture page spec (Rushendra)
-docs/DEMO.md        setup checklist, the two demos, judge Q&A
-server/             FastAPI server + OpenCV calibration + solver + dashboard (teammate)
-server/static/      capture.html (Rushendra), board.html + index.html (teammate)
-marker/             (unused now; kept from the ARKit plan)
-```
-
-## Quickstart
+## Run
 
 ```bash
 cd server
-python3 -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 uvicorn app:app --host 0.0.0.0 --port 8443 --ssl-certfile certs/cert.pem --ssl-keyfile certs/key.pem
-# phones:    https://<mac-ip>:8443/static/capture.html
-# dashboard: https://<mac-ip>:8443/
+# nurse board: https://<mac-ip>:8443/      patients: scan the QR on the board
+# room camera: https://<mac-ip>:8443/static/room.html on a phone on a stand (or the Mac webcam)
 ```
 
-HTTPS is required (Safari only exposes the camera on secure origins). `docs/WEB.md` §0 has the
-two-minute `mkcert` setup.
+Phones need HTTPS for the camera: `mkcert` (2 min, `docs/WEB.md` §0). Everything joins one phone's hotspot.
 
-## Network
+## Repo
 
-eduroam blocks device-to-device traffic. Everything joins one phone's **Personal Hotspot**.
-The server runs on the Mac.
+```
+server/                 FastAPI app, signal analysis (vitals.py), patient / board / room pages
+docs/VIGIL.md           the brief: flow, tasks, demo script
+docs/SLIDES.md          the six slides
+docs/DEMO.md            setup checklist, script, judge Q&A
+legacy_hawkeye/         what we built first: two-phone 3D ball tracking (calibration worked; we pivoted)
+```
+
+## What we built first
+
+HawkEye: two iPhones → self-calibrating stereo → 3D ball trajectory with gravity as a self-check.
+Intrinsics and extrinsics calibrated to 0.3 px on real data; the per-use setup was too heavy to demo
+well, so we kept the stack and pointed it at a problem that matters. See `legacy_hawkeye/`.
