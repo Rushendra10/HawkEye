@@ -171,7 +171,7 @@ def patients():
         out.append({"id": p["id"], "name": p["name"], "age": p["age"], "complaint": p["complaint"], "pain": p["pain"], "flags": p["flags"],
                     "joined": p["joined"], "last": last, "n_checks": len(p["checks"]), "recheck_requested": p["recheck_requested"],
                     "glow": p["glow"], "hr_series": [[c["t"], c.get("hr")] for c in ok_checks], "rr_series": [[c["t"], c.get("rr")] for c in ok_checks],
-                    **sc})
+                    **sc, **vitals.risk(p, ok_checks)})
     out.sort(key=lambda x: (-x["score"], -(now - (x["last"]["t"] if x["last"] else x["joined"]))))
     return {"server_time": now, "patients": out, "room": ROOM}
 

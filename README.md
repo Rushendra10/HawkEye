@@ -7,7 +7,9 @@ Scan a QR → a web page (no app) → fingertip on the camera with the flash on 
 pulse-oximeter-grade waveform → **heart rate, breathing rate, HRV, perfusion**, then a 10-second
 press-and-relax **capillary refill** test. The nurse's board ranks everyone in the room with a
 transparent NEWS-style score plus *trend since arrival*, asks for re-checks every 15 minutes, and can
-make a patient's phone glow to find them. A room camera counts everyone's breathing between checks,
+make a patient's phone glow to find them. Next to the score, a **risk percentile** from a logistic model
+trained on 3,964 PhysioNet ICU patients (CinC 2019: heart rate, breathing, age, trend → sepsis within 6 h;
+test AUROC 0.67 vs 0.64 for the NEWS bands). A room camera counts everyone's breathing between checks,
 contactless, from chest motion.
 
 Built in 24 h at Social Hack 2026 (UMN), theme *Connect & Intersect*. Honest claims only: it catches

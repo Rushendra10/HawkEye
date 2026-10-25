@@ -98,8 +98,10 @@ def main():
     m = LogisticRegression(C=1.0, class_weight="balanced", max_iter=2000).fit(sc.transform(Xtr)[:, keep], ytr)
     auroc = float(roc_auc_score(yte, m.predict_proba(sc.transform(Xte)[:, keep])[:, 1]))
     print("saved model coefficients (standardized):", dict(zip([FEATS[i] for i in keep], np.round(m.coef_[0], 3))))
+    logit_tr = m.decision_function(sc.transform(Xtr)[:, keep])
     json.dump({"features": [FEATS[i] for i in keep], "mean": sc.mean_[keep].tolist(), "scale": sc.scale_[keep].tolist(),
                "coef": m.coef_[0].tolist(), "intercept": float(m.intercept_[0]),
+               "logit_percentiles": np.percentile(logit_tr, np.arange(101)).tolist(),   # for "higher than X% of training hours"
                "trained_on": f"PhysioNet/CinC 2019 training set A, {len(pts)} patients, {len(ytr) + len(yte)} hourly ICU rows",
                "label": "sepsis onset within 6 h (Sepsis-3)", "test_auroc": auroc,
                "baseline_news2_hr_rr_auroc": float(roc_auc_score(yte, news_baseline(Xte)))}, open(out, "w"), indent=1)

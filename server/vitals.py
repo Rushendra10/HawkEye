@@ -2,7 +2,10 @@
 Pure numpy. Inputs are lists of [t, R, G, B] per frame (t in seconds, phone clock; only differences matter)."""
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+import json
+import math
+import os
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
@@ -205,6 +208,50 @@ def news_points_rr(rr: Optional[float]) -> int:
     if rr <= 20: return 0
     if rr <= 24: return 2
     return 3
+
+
+_MODEL: Any = None
+
+
+def _model() -> Optional[Dict]:
+    """Logistic model from model/train.py (PhysioNet/CinC 2019), stored as plain JSON. None if absent."""
+    global _MODEL
+    if _MODEL is None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model", "deterioration.json")
+        try:
+            with open(path) as f:
+                _MODEL = json.load(f)
+        except Exception:
+            _MODEL = False
+    return _MODEL or None
+
+
+def risk(p: Dict, checks: List[Dict]) -> Dict:
+    """Model risk for the latest good check: percentile of the model score against the training hours
+    (risk 92 = higher than 92% of training hours). Shown next to the score, never used for sorting."""
+    m = _model()
+    if not m or not checks:
+        return {}
+    last, first = checks[-1], checks[0]
+    hr, rr = last.get("hr"), last.get("rr")
+    if hr is None or rr is None:
+        return {}
+    ref = first                                   # the check ~3 h before the latest one, else the first
+    for c in checks:
+        if last["t"] - c["t"] >= 3 * 3600:
+            ref = c
+    feats = {"hr": hr, "rr": rr, "age": p.get("age"),
+             "d_hr_3h": hr - (ref.get("hr") or hr), "d_rr_3h": rr - (ref.get("rr") or rr),
+             "hr_rise": hr - (first.get("hr") or hr), "rr_rise": rr - (first.get("rr") or rr)}
+    logit = m["intercept"]
+    for f, mu, sd, c in zip(m["features"], m["mean"], m["scale"], m["coef"]):
+        v = feats.get(f)
+        logit += 0.0 if v is None else c * (v - mu) / sd
+    out = {"risk_logit": round(float(logit), 3), "risk_prob": round(float(1 / (1 + math.exp(-logit))), 3)}
+    grid = m.get("logit_percentiles")
+    if grid:
+        out["risk"] = int(min(100, np.searchsorted(np.array(grid), logit)))
+    return out
 
 
 def score_patient(p: Dict, now: float) -> Dict:

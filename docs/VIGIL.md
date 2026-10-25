@@ -22,6 +22,10 @@ aid, not a diagnostic; no SpO2, no BP number.
 - `vitals.py`: PPG analysis (HR, RR from respiratory modulation, RMSSD/SDNN, perfusion index, SQI),
   capillary refill (exponential recovery after release), complaint red flags, NEWS-style score with reasons.
   Verified on real data: HR 72 (contact finger, 120 fps, SNR 155); 113 and 130 bpm on synthetic fast rates.
+- `model/train.py` + `model/deterioration.json`: logistic model trained on PhysioNet/CinC 2019 (3,964 ICU patients,
+  151k hourly rows): HR, RR, age, change over 3 h and since arrival → sepsis within 6 h. Test AUROC 0.67 vs 0.64 for
+  the NEWS bands on HR+RR. Shown on the board as a "Risk" percentile next to the score; the score still sorts.
+  Retrain: `python model/train.py <dir of p*.psv>` (needs scikit-learn; the server only reads the JSON).
 - `static/patient.html`: join → 20 s pulse check with live waveform → press/relax refill test → results →
   15-min countdown; polls `/me` for nurse re-check requests and "find me" glow.
 - `static/board.html`: nurse board: ranked table, sparklines, reasons, Re-check / Find / Seen, QR to join,
