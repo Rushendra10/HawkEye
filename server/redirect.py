@@ -28,7 +28,8 @@ class H(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
-        path = "/" if self.path.rstrip("/") == "/board" else "/go"   # patients land on check-in; /board is the nurse view
+        p = self.path.rstrip("/")
+        path = "/" if p == "/board" else "/static/room.html" if p == "/room" else "/go"   # patients land on check-in
         self.send_response(302)
         self.send_header("Location", f"https://{host}:8443{path}")
         self.send_header("Content-Length", "0")
