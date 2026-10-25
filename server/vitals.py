@@ -138,7 +138,8 @@ def analyze_crt(frames: List[List[float]], release_t: Optional[float] = None) ->
         if win.sum() > 5:
             d = np.where(win, d, 0)
     i0 = int(np.argmin(d))
-    if d[i0] > -1.0:
+    # a real release is a sharp fall (tens of units per second); a slow drift of the whole trace is not a refill test
+    if d[i0] > -5.0:
         return {"ok": False, "reason": "no release detected (press harder, then relax without lifting)"}
     # blanched level: top of the 2.5 s before the steepest point. Baseline: the last 2 s of the window,
     # after any hyperaemic undershoot. Onset: the last moment the curve was still on the blanched plateau.
@@ -149,7 +150,7 @@ def analyze_crt(frames: List[List[float]], release_t: Optional[float] = None) ->
     y0 = float(np.percentile(sm[pre], 90))
     y_inf = float(np.median(sm[post][t[post] >= t[post][-1] - 2.0]))
     amp = y0 - y_inf
-    if amp < 4:
+    if amp < 6:
         return {"ok": False, "reason": "blanching too small (press harder)"}
     cand = np.where(pre & (sm >= y0 - 0.1 * amp))[0]
     on = int(cand[-1]) if len(cand) else i0
