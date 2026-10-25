@@ -1,11 +1,11 @@
-# server — Vigil
+# server: Vigil
 
 FastAPI app + signal analysis + static pages. Brief and task split: `../docs/VIGIL.md`.
 
 ```
 app.py              endpoints: /join /measure /me/{id} /recheck/{id} /glow/{id} /seen/{id} /patients /room /reset
 vitals.py           fingertip PPG -> HR, RR, HRV, perfusion, SQI; capillary refill; red flags; NEWS-style score
-static/patient.html patient phone page (join -> 30 s pulse check -> refill test -> results -> 15-min cycle)
+static/patient.html patient phone page (join -> 20 s pulse check -> refill test -> results -> 15-min cycle)
 static/board.html   nurse board (served at /)
 static/room.html    room camera: contactless breathing per seat (teammate; seed = breath_test.html)
 static/breath_test.html, vitals_test.html   feasibility pages, keep

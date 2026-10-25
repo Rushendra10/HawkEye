@@ -131,36 +131,44 @@ def analyze_crt(frames: List[List[float]], release_t: Optional[float] = None) ->
     # release = steepest sustained drop; search near the UI marker if given
     d = np.gradient(sm, t)
     if release_t is not None:
-        win = (t > release_t - 1.5) & (t < release_t + 2.5)
+        win = (t > release_t - 1.5) & (t < release_t + 3.5)   # people react late, never early
         if win.sum() > 5:
             d = np.where(win, d, 0)
     i0 = int(np.argmin(d))
     if d[i0] > -1.0:
         return {"ok": False, "reason": "no release detected (press harder, then relax without lifting)"}
-    t0 = t[i0]
+    # blanched level: top of the 2.5 s before the steepest point. Baseline: the last 2 s of the window,
+    # after any hyperaemic undershoot. Onset: the last moment the curve was still on the blanched plateau.
+    pre = (t >= t[i0] - 2.5) & (t < t[i0])
+    post = (t >= t[i0]) & (t <= t[i0] + 6)
+    if pre.sum() < 5 or post.sum() < 20:
+        return {"ok": False, "reason": "not enough data around release"}
+    y0 = float(np.percentile(sm[pre], 90))
+    y_inf = float(np.median(sm[post][t[post] >= t[post][-1] - 2.0]))
+    amp = y0 - y_inf
+    if amp < 4:
+        return {"ok": False, "reason": "blanching too small (press harder)"}
+    cand = np.where(pre & (sm >= y0 - 0.1 * amp))[0]
+    on = int(cand[-1]) if len(cand) else i0
+    t0 = t[on]
     seg = (t >= t0) & (t <= t0 + 6)
     ts, ys = t[seg] - t0, sm[seg]
-    if len(ts) < 20:
-        return {"ok": False, "reason": "not enough data after release"}
-    y_inf = float(np.percentile(ys[-max(5, len(ys) // 5):], 50))
-    y0 = float(sm[max(0, i0 - int(0.2 * fs))])
-    amp = y0 - y_inf
-    if amp < 2:
-        return {"ok": False, "reason": "blanching too small (press harder)"}
     # time to recover 90% of the drop, read directly from the smoothed curve
     thr90 = y0 - 0.9 * amp
     below = np.where(ys <= thr90)[0]
     t90 = float(ts[below[0]]) if len(below) else None
-    # exponential time constant via log-linear fit on the first 70% of recovery
+    # exponential time constant: log-linear fit while the curve is still above baseline and falling
     frac = (ys - y_inf) / amp
-    ok = (frac > 0.05) & (frac < 0.95)
+    end = int(np.argmax(frac <= 0.05)) if np.any(frac <= 0.05) else len(frac)
+    fit = np.zeros(len(frac), dtype=bool); fit[:end] = True
+    fit &= (frac > 0.05) & (frac < 0.95)
     tau = None
-    if ok.sum() > 10:
-        slope, _ = np.polyfit(ts[ok], np.log(frac[ok]), 1)
-        if slope < 0:
+    if fit.sum() >= 5:
+        slope, _ = np.polyfit(ts[fit], np.log(frac[fit]), 1)
+        if slope < 0 and 0.05 < -1 / slope < 5:
             tau = float(-1 / slope)
-    return {"ok": t90 is not None, "release_t": float(t0), "crt_s": round(t90, 2) if t90 else None,
-            "tau_s": round(tau, 2) if tau else None, "blanch_amp": round(amp, 1),
+    return {"ok": t90 is not None, "release_t": float(t0), "crt_s": round(t90, 2) if t90 is not None else None,
+            "tau_s": round(tau, 2) if tau is not None else None, "blanch_amp": round(amp, 1),
             "curve": [[round(float(x), 2), round(float(y), 1)] for x, y in zip(ts[:: max(1, int(fs // 20))], ys[:: max(1, int(fs // 20))])]}
 
 

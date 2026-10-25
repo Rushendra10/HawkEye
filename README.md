@@ -1,10 +1,10 @@
-# Vigil , the waiting room gets a monitor
+# Vigil: the waiting room gets a monitor
 
 Triage is a snapshot at arrival. Waiting is where people get worse unseen. Vigil turns every phone in
 an ER waiting room into the monitor that notices.
 
-Scan a QR → a web page (no app) → fingertip on the camera with the flash on for 30 s → a
-pulse-oximeter-grade waveform → **heart rate, breathing rate, HRV, perfusion**, then a 12-second
+Scan a QR → a web page (no app) → fingertip on the camera with the flash on for 20 s → a
+pulse-oximeter-grade waveform → **heart rate, breathing rate, HRV, perfusion**, then a 10-second
 press-and-relax **capillary refill** test. The nurse's board ranks everyone in the room with a
 transparent NEWS-style score plus *trend since arrival*, asks for re-checks every 15 minutes, and can
 make a patient's phone glow to find them. A room camera counts everyone's breathing between checks,
@@ -23,20 +23,15 @@ uvicorn app:app --host 0.0.0.0 --port 8443 --ssl-certfile certs/cert.pem --ssl-k
 # room camera: https://<mac-ip>:8443/static/room.html on a phone on a stand (or the Mac webcam)
 ```
 
-Phones need HTTPS for the camera: `mkcert` (2 min, `docs/WEB.md` §0). Everything joins one phone's hotspot.
+Phones need HTTPS for the camera: `mkcert`, 2 min, see `docs/HTTPS.md`. Everything joins one phone's hotspot.
 
 ## Repo
 
 ```
 server/                 FastAPI app, signal analysis (vitals.py), patient / board / room pages
+docs/slides.html        the deck (arrow keys; cmd-P for PDF)
 docs/VIGIL.md           the brief: flow, tasks, demo script
-docs/SLIDES.md          the six slides
 docs/DEMO.md            setup checklist, script, judge Q&A
-legacy_hawkeye/         what we built first: two-phone 3D ball tracking (calibration worked; we pivoted)
+docs/HTTPS.md           local certificates for the phones
+legacy_hawkeye/         an earlier prototype, not part of Vigil
 ```
-
-## What we built first
-
-HawkEye: two iPhones → self-calibrating stereo → 3D ball trajectory with gravity as a self-check.
-Intrinsics and extrinsics calibrated to 0.3 px on real data; the per-use setup was too heavy to demo
-well, so we kept the stack and pointed it at a problem that matters. See `legacy_hawkeye/`.
